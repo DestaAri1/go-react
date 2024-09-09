@@ -9,7 +9,7 @@ import (
 
 func Init(DBMigrator func(db *gorm.DB) error) *gorm.DB {
 
-	db, err := gorm.Open(mysql.Open("root:@/golang?parseTime=true"), &gorm.Config{
+	db, err := gorm.Open(mysql.Open("root:@/golang?charset=utf8mb4&parseTime=True&loc=Local"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),	
 	})
 

@@ -15,6 +15,21 @@ type TicketHandler struct {
 	repository models.TicketRepository
 }
 
+func (h *TicketHandler) handlerError (ctx *fiber.Ctx, status int, message string) error {
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status": "fail",
+		"message" : message,
+	})
+}
+
+func (h *TicketHandler) handlerSuccess(ctx *fiber.Ctx, status int, message string, data interface{}) error {
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status" : "success",
+		"message" : message,
+		"data" : data,
+	})
+}
+
 func (h *TicketHandler) GetMany(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()

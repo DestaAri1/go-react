@@ -33,7 +33,12 @@ func (r *EventRepository) GetOne(ctx context.Context, eventId uint) (*models.Eve
 
 	return event, nil
 }
-func (r *EventRepository) CreateOne(ctx context.Context, event *models.Event) (*models.Event, error) {
+
+func (r *EventRepository) CreateOne(ctx context.Context, event *models.Event, formInput *models.FormEventInput) (*models.Event, error) {
+	event.Name = formInput.Name
+	event.Location = formInput.Location
+	event.Date = formInput.Date
+	
 	res := r.db.Model(event).Create(event)
 
 	if res.Error != nil {

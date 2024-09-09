@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -11,6 +12,21 @@ import (
 )
 
 var validate = validator.New()
+
+func (h *AuthHandler) handleError (ctx *fiber.Ctx, status int, message string) error {
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status" : "fail",
+		"message" : message,
+	})
+}
+
+func (h *AuthHandler) handleSucces (ctx *fiber.Ctx, status int, message string, data interface{}) error {
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status" : "fail",
+		"message" : message,
+		"data" : data,
+	})
+}
 
 type AuthHandler struct {
 	service models.AuthServices
@@ -23,37 +39,46 @@ func (h *AuthHandler) Login(ctx *fiber.Ctx) error {
 	defer cancel()
 
 	if err := ctx.BodyParser(&creds); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : err.Error(),
-			"data" : nil,
-		})
+		return h.handleError(ctx, fiber.StatusBadRequest, err.Error())
 	}
 
 	if err := validate.Struct(creds); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : err.Error(),
-		})
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			for _, err := range ve {
+				var message string
+				switch err.Field() {
+				case "Email" :
+					switch err.Tag() {
+					case "required":
+						message = fmt.Errorf("email field is required").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					case "email" :
+						message = fmt.Errorf("please use an email format").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					}
+				case "Password" :
+					switch err.Tag() {
+					case "required":
+						message = fmt.Errorf("password field is required").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					}
+				}
+			}
+		}
 	}
 
 	token, user, err := h.service.Login(context, creds)
 
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : err.Error(),
-		})
+		return h.handleError(ctx, fiber.StatusBadRequest, err.Error())
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"status" : "success",
-		"message" : "Succesfully logged in",
-		"data" : &fiber.Map{
-			"token" : token,
-			"user" : user,
-		},
-	})
+	data := &fiber.Map{
+		"token" : token,
+		"user" : user,
+	}
+	return h.handleSucces(ctx, fiber.StatusOK, "Successfully logged in", data)
 }
 
 func (h *AuthHandler) Register(ctx *fiber.Ctx) error {
@@ -63,37 +88,47 @@ func (h *AuthHandler) Register(ctx *fiber.Ctx) error {
 	defer cancel()
 
 	if err := ctx.BodyParser(&creds); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : err.Error(),
-			"data" : nil,
-		})
+		return h.handleError(ctx, fiber.StatusBadRequest, err.Error())
 	}
 
 	if err := validate.Struct(creds); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : fmt.Errorf("please provide a valid email and password").Error(),
-		})
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			for _, err := range ve {
+				var message string
+				switch err.Field() {
+				case "Email" :
+					switch err.Tag() {
+					case "required":
+						message = fmt.Errorf("email field is required").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					case "email" :
+						message = fmt.Errorf("please use an email format").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					}
+				case "Password" :
+					switch err.Tag() {
+					case "required":
+						message = fmt.Errorf("password field is required").Error()
+						return h.handleError(ctx, fiber.StatusBadRequest, message)
+					}
+				}
+			}
+		}
 	}
 
 	token, user, err := h.service.Register(context, creds)
 
 	if err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
-			"status" : "fail",
-			"message" : err.Error(),
-		})
+		return h.handleError(ctx, fiber.StatusBadRequest, err.Error())
 	}
 
-	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
-		"status" : "success",
-		"message" : "Succesfully logged in",
-		"data" : &fiber.Map{
-			"token" : token,
-			"user" : user,
-		},
-	})
+	data := &fiber.Map{
+		"token" : token,
+		"user" : user,
+	}
+
+	return h.handleSucces(ctx, fiber.StatusOK, "Successfully logged in", data)
 }
 
 func NewAuthHandler(router fiber.Router, service models.AuthServices) {

@@ -21,9 +21,15 @@ type Event struct {
 type EventRepository interface{
 	GetMany(ctx context.Context) ([]*Event, error)
 	GetOne(ctx context.Context, eventId uint) (*Event, error)
-	CreateOne(ctx context.Context, event *Event) (*Event, error)
+	CreateOne(ctx context.Context, event *Event, formInput *FormEventInput) (*Event, error)
 	UpdateOne(ctx context.Context, eventId uint, updateData map[string]interface{}) (*Event, error)
 	DeleteOne(ctx context.Context, eventId uint) error
+}
+
+type FormEventInput struct{
+	Name     string    `json:"name" validate:"required,min=3,max=100"`
+	Location string    `json:"location" validate:"required"`
+	Date     time.Time `json:"date" validate:"required"`
 }
 
 func (e *Event) AfterFind(db *gorm.DB) (err error) {

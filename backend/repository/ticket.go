@@ -39,7 +39,7 @@ func (r *TickerRepository) GetOne(ctx context.Context, userId uint, ticketId uin
 func (r *TickerRepository) CreateOne(ctx context.Context, ticket *models.Ticket, userId uint) (*models.Ticket, error) {
 	ticket.UserId = userId
 	
-	res := r.db.Model(ticket).Create(ticket)
+	res := r.db.Model(&models.Ticket{}).Create(ticket)
 
 	if res.Error != nil {
 		return nil, res.Error
