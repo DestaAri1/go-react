@@ -73,3 +73,27 @@ func AuthProtected(db *gorm.DB) fiber.Handler {
 		return ctx.Next()
 	}
 }
+
+// RoleAuthorization middleware to check if user has the required role
+func RoleAuthorization(allowedRoles ...models.UserRole) fiber.Handler {
+    return func(c *fiber.Ctx) error {
+        user, ok := c.Locals("user").(*models.User)
+        if !ok || user == nil {
+            return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                "status":  "fail",
+                "message": "Access denied",
+            })
+        }
+
+        for _, role := range allowedRoles {
+            if user.Role == role {
+                return c.Next()
+            }
+        }
+
+        return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+            "status":  "fail",
+            "message": "Access denied",
+        })
+    }
+}

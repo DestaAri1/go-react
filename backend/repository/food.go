@@ -34,7 +34,9 @@ func (r *FoodRepository) GetOne(ctx context.Context, foodId uint) (*models.Food,
 	return food, nil
 }
 
-func (r *FoodRepository) CreateOne(ctx context.Context, food *models.Food) (*models.Food, error) {
+func (r *FoodRepository) CreateOne(ctx context.Context, food *models.Food, formInput *models.FormFoodInput) (*models.Food, error) {
+	food.Name = formInput.Name
+
 	res := r.db.Model(&models.Food{}).Create(food)
 
 	if res.Error != nil {

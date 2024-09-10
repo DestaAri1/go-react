@@ -6,17 +6,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRole string
+type UserRole int
 
 const (
-	Manager  UserRole = "manager"
-	Attendee UserRole = "attendee"
+	Manager  UserRole = 0
+	Attendee UserRole = 1
 )
 
 type User struct {
 	Id        uint      `json:"id" gorm:"primarykey"`
 	Email     string    `json:"email" gorm:"text;not null"`
-	Role      UserRole  `json:"role" gorm:"text;default:attendee"`
+	Role      UserRole  `json:"role" gorm:"type:integer;default:1"`
 	Password  string    `json:"-"` //Do not compute the password in json
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`

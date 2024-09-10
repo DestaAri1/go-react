@@ -1,44 +1,152 @@
 package handlers
 
-// import (
-// 	"context"
-// 	"time"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"strconv"
+	"time"
 
-// 	"github.com/DestaAri1/go-react/models"
-// 	"github.com/gofiber/fiber/v2"
-// )
+	"github.com/DestaAri1/go-react/middlewares"
+	"github.com/DestaAri1/go-react/models"
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
+)
 
-// type FoodHandlers struct {
-// 	repository models.FoodRepository
-// }
+type FoodHandlers struct {
+	repository models.FoodRepository
+}
 
-// func (h *FoodHandlers) GetMany(ctx *fiber.Ctx) error {
-// 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
-// 	defer cancel()
+func (h *FoodHandlers) respond(ctx *fiber.Ctx, status int, message string, data interface{}) error {
+	var status2 string
+	if status == fiber.StatusOK {
+		status2 = "success"
+	} else {
+		status2 = "fail"
+	}
+	return ctx.Status(status).JSON(&fiber.Map{
+		"status" :  status2,
+		"message": message,
+		"data":    data,
+	})
+}
 
-// 	// foods, err := h.repository.GetMany(context)
+func (h *FoodHandlers) handleValidationError(ctx *fiber.Ctx, err error) error {
+	var ve validator.ValidationErrors
+	if errors.As(err, &ve) {
+		for _, err := range ve {
+			var message string
+			switch err.Field() {
+			case "Name":
+				switch err.Tag() {
+				case "required":
+					message = fmt.Sprintf("name field is required")
+				case "min":
+					message = fmt.Sprintf("minimum character is 3")
+				case "max":
+					message = fmt.Sprintf("maximum character is 100")
+				}
+				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
+			}
+		}
+	}
+	return nil
+}
 
-// 	// if err != nil {
-// 	// 	return ctx.Status(fiber.StatusBadGateway).JSON(&fiber.Map{
-// 	// 		"status" : "fail",
-// 	// 		"message" : err.Error(),
-// 	// 	})
-// 	// }
+func (h *FoodHandlers) GetMany(ctx *fiber.Ctx) error {
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-// 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
-// 		"status" : "success",
-// 		"message" : "",
-// 		"data" : context,
-// 	})
-// }
+	foods, err := h.repository.GetMany(context)
+	if err != nil {
+		return h.respond(ctx, fiber.StatusBadGateway, err.Error(), nil)
+	}
+	return h.respond(ctx, fiber.StatusOK, "", foods)
+}
 
-// func NewFoodHandler(router fiber.Router, repository models.FoodRepository) {
-// 	handler := &TicketHandler{
-// 		repository : repository,
-// 	}
+func (h *FoodHandlers) GetOne(ctx *fiber.Ctx) error {
+	foodId, _ := strconv.Atoi(ctx.Params("foodId"))
 
-// 	router.Get("/", handler.GetMany)
-// 	router.Post("/", handler.CreateOne)
-// 	router.Get("/:ticketId", handler.GetOne)
-// 	router.Post("/validate", handler.ValidateOne)
-// }
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	food, err := h.repository.GetOne(context, uint(foodId))
+	if err != nil {
+		return h.respond(ctx, fiber.StatusBadRequest, err.Error(), nil)
+	}
+	return h.respond(ctx, fiber.StatusOK, "", food)
+}
+
+func (h *FoodHandlers) CreateOne(ctx *fiber.Ctx) error {
+	formData := &models.FormFoodInput{}
+
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := ctx.BodyParser(formData); err != nil {
+		return h.respond(ctx, fiber.StatusUnprocessableEntity, err.Error(), nil)
+	}
+
+	if err := validator.New().Struct(formData); err != nil {
+		return h.handleValidationError(ctx, err)
+	}
+
+	food := &models.Food{Name: formData.Name}
+	food, err := h.repository.CreateOne(context, food, formData)
+
+	if err != nil {
+		return h.respond(ctx, fiber.StatusBadGateway, err.Error(), nil)
+	}
+
+	return h.respond(ctx, fiber.StatusOK, "", food)
+}
+
+func (h *FoodHandlers) UpdateOne(ctx *fiber.Ctx) error {
+	foodId, _ := strconv.Atoi(ctx.Params("foodId"))
+
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	updateData := make(map[string]interface{})
+	if err := ctx.BodyParser(&updateData); err != nil {
+		return h.respond(ctx, fiber.StatusUnprocessableEntity, err.Error(), nil)
+	}
+
+	formData := &models.FormFoodInput{}
+	if err := mapToStruct(updateData, formData); err != nil || validator.New().Struct(formData) != nil {
+		return h.handleValidationError(ctx, err)
+	}
+
+	food, err := h.repository.UpdateOne(context, uint(foodId), updateData)
+	if err != nil {
+		return h.respond(ctx, fiber.StatusBadGateway, err.Error(), nil)
+	}
+
+	return h.respond(ctx, fiber.StatusOK, "Event updated successfully!", food)
+}
+
+func (h *FoodHandlers) DeleteOne(ctx *fiber.Ctx) error {
+	foodId, _ := strconv.Atoi(ctx.Params("foodId"))
+
+	context, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := h.repository.DeleteOne(context, uint(foodId)); err != nil {
+		return h.respond(ctx, fiber.StatusBadRequest, err.Error(), nil)
+	}
+	return h.respond(ctx, fiber.StatusOK, "Data successfully deleted", nil)
+}
+
+func NewFoodHandler(router fiber.Router, repository models.FoodRepository) {
+	handler := &FoodHandlers{repository: repository}
+
+    // Public routes
+    router.Get("/", handler.GetMany)
+    router.Get("/:foodId", handler.GetOne)
+
+    // Protected routes
+    protected := router.Group("/").Use(middlewares.RoleAuthorization(models.Manager)) // Only managers can access these routes
+    protected.Post("/", handler.CreateOne)
+    protected.Put("/:foodId", handler.UpdateOne)
+    protected.Delete("/:foodId", handler.DeleteOne)
+}
