@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/DestaAri1/go-react/models"
 	"gorm.io/gorm"
@@ -47,15 +48,25 @@ func (r *FoodRepository) CreateOne(ctx context.Context, food *models.Food, formI
 }
 
 func (r *FoodRepository) UpdateOne(ctx context.Context, foodId uint, updateData map[string]interface{}) (*models.Food, error) {
-	food := &models.Food{}
+    // Fetch the existing food record
+    food := &models.Food{}
+    err := r.db.WithContext(ctx).First(food, foodId).Error
+    if err != nil {
+        if err == gorm.ErrRecordNotFound {
+            // Handle record not found error (optional: return specific error or nil)
+            return nil, errors.New("food not found") // Example error handling
+        }
+        return nil, err
+    }
 
-	updateFood := r.db.Model(food).Where("id = ?", foodId).Updates(updateData)
+    // Update the food record in the database
+    updateFood := r.db.WithContext(ctx).Model(food).Where("id = ?", foodId).Updates(updateData)
+    if updateFood.Error != nil {
+        return nil, updateFood.Error
+    }
 
-	if updateFood.Error != nil {
-		return nil, updateFood.Error
-	}
-
-	return food, nil
+    // Return the updated food record
+    return food, nil
 }
 
 func (r *FoodRepository) DeleteOne(ctx context.Context, foodId uint) error {

@@ -32,6 +32,40 @@ func (h *EventHandler) handleSuccess(ctx *fiber.Ctx, status int, message string,
 	})
 }
 
+func (h *EventHandler) handleValidationError(ctx *fiber.Ctx, err error) error {
+	var ve validator.ValidationErrors
+	if errors.As(err, &ve) {
+		for _, err := range ve {
+			var message string
+			switch err.Field() {
+			case "Name":
+				switch err.Tag() {
+				case "required":
+					message = fmt.Errorf("name field is required").Error()
+				case "min":
+					message = fmt.Errorf("minimum character is 3").Error()
+				case "max":
+					message = fmt.Errorf("maximum character is 100").Error()
+				}
+				return h.handleError(ctx, fiber.StatusBadRequest, message)
+			case "Location":
+				switch err.Tag() {
+				case "required":
+					message = fmt.Errorf("location field is required").Error()
+				}
+				return h.handleError(ctx, fiber.StatusBadRequest, message)
+			case "Date":
+				switch err.Tag() {
+				case "required":
+					message = fmt.Errorf("date field is required").Error()
+				}
+				return h.handleError(ctx, fiber.StatusBadRequest, message)
+			}
+		}
+	}
+	return nil
+}
+
 func (h *EventHandler) GetMany(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
@@ -76,38 +110,7 @@ func (h *EventHandler) CreateOne(ctx *fiber.Ctx) error {
 	}
 
 	if err := validator.New().Struct(formData); err != nil {
-		var ve validator.ValidationErrors
-		if errors.As(err, &ve) {
-			for _, err := range ve {
-				var message string
-				switch err.Field() {
-				case "Name":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("name field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					case "min":
-						message = fmt.Errorf("minimum character is 3").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					case "max":
-						message = fmt.Errorf("maximum character is 100").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				case "Location":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("location field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				case "Date":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("date field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				}
-			}
-		}
+		return h.handleValidationError(ctx, err)
 	}
 
 	event.Name = formData.Name
@@ -143,38 +146,7 @@ func (h *EventHandler) UpdateOne(ctx *fiber.Ctx) error {
 
 	// Lakukan validasi terhadap data yang di-update
 	if err := validator.New().Struct(formData); err != nil {
-		var ve validator.ValidationErrors
-		if errors.As(err, &ve) {
-			for _, err := range ve {
-				var message string
-				switch err.Field() {
-				case "Name":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("name field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					case "min":
-						message = fmt.Errorf("minimum character is 3").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					case "max":
-						message = fmt.Errorf("maximum character is 100").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				case "Location":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("location field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				case "Date":
-					switch err.Tag() {
-					case "required":
-						message = fmt.Errorf("date field is required").Error()
-						return h.handleError(ctx, fiber.StatusBadRequest, message)
-					}
-				}
-			}
-		}
+		return h.handleValidationError(ctx, err)
 	}
 
 	// Setelah validasi, lakukan update

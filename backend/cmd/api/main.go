@@ -34,7 +34,7 @@ func main() {
 	//Handlers
 	handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
-	handlers.NewFoodHandler(privateRoutes.Group("/food"), foodRepository)
+	handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)
 
 	app.Listen(":3000")
 }

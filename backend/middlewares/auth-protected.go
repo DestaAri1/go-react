@@ -74,17 +74,27 @@ func AuthProtected(db *gorm.DB) fiber.Handler {
 	}
 }
 
-// RoleAuthorization middleware to check if user has the required role
-func RoleAuthorization(allowedRoles ...models.UserRole) fiber.Handler {
+func RoleAuthorization(db *gorm.DB, allowedRoles ...models.UserRole) fiber.Handler {
     return func(c *fiber.Ctx) error {
-        user, ok := c.Locals("user").(*models.User)
-        if !ok || user == nil {
+        // Ambil userId dari Locals
+        userId, ok := c.Locals("userId").(float64) // Sesuaikan dengan tipe data userId yang disimpan di token
+        if !ok {
             return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
                 "status":  "fail",
-                "message": "Access denied",
+                "message": "user not found",
             })
         }
 
+        // Query untuk mendapatkan user dari database
+        var user models.User
+        if err := db.First(&user, "id = ?", uint(userId)).Error; err != nil {
+            return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                "status":  "fail",
+                "message": "user not found",
+            })
+        }
+
+        // Cek apakah role user sesuai dengan allowedRoles
         for _, role := range allowedRoles {
             if user.Role == role {
                 return c.Next()

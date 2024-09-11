@@ -11,6 +11,7 @@ import (
 	"github.com/DestaAri1/go-react/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type FoodHandlers struct {
@@ -42,9 +43,17 @@ func (h *FoodHandlers) handleValidationError(ctx *fiber.Ctx, err error) error {
 				case "required":
 					message = fmt.Sprintf("name field is required")
 				case "min":
-					message = fmt.Sprintf("minimum character is 3")
+					message = fmt.Sprintf("minimum character is 4")
 				case "max":
 					message = fmt.Sprintf("maximum character is 100")
+				}
+				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
+			case "Selled": 
+				switch err.Tag() {
+				case "required":
+					message = fmt.Sprint("you must add some number")
+				case "number":
+					message = fmt.Sprint("please give as some number")
 				}
 				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
 			}
@@ -137,15 +146,15 @@ func (h *FoodHandlers) DeleteOne(ctx *fiber.Ctx) error {
 	return h.respond(ctx, fiber.StatusOK, "Data successfully deleted", nil)
 }
 
-func NewFoodHandler(router fiber.Router, repository models.FoodRepository) {
-	handler := &FoodHandlers{repository: repository}
+func NewFoodHandler(router fiber.Router, db *gorm.DB, repository models.FoodRepository) {
+    handler := &FoodHandlers{repository: repository}
 
     // Public routes
     router.Get("/", handler.GetMany)
     router.Get("/:foodId", handler.GetOne)
 
-    // Protected routes
-    protected := router.Group("/").Use(middlewares.RoleAuthorization(models.Manager)) // Only managers can access these routes
+    // Protected routes - Only managers can access these routes
+    protected := router.Group("/").Use(middlewares.AuthProtected(db)).Use(middlewares.RoleAuthorization(db, models.Manager))
     protected.Post("/", handler.CreateOne)
     protected.Put("/:foodId", handler.UpdateOne)
     protected.Delete("/:foodId", handler.DeleteOne)
