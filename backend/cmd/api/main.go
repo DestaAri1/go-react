@@ -21,6 +21,7 @@ func main() {
 	ticketRepository := repository.NewTicketRepository(db)
 	authRepository := repository.NewAuthRepository(db)
 	foodRepository := repository.NewFoodRepositories(db)
+	foodOrderRepository := repository.NewFoodOrderRepository(db)
 
 	//Service
 	authService := services.NewAuthService(authRepository)
@@ -35,6 +36,7 @@ func main() {
 	handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
 	handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)
+	handlers.NewFoodOrderHandler(privateRoutes.Group("food_order"), db, foodOrderRepository)
 
 	app.Listen(":3000")
 }

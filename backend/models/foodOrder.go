@@ -16,6 +16,7 @@ type FoodOrder struct {
 
 type FoodOrderRepository interface {
 	CreateMany(ctx context.Context, foodOrders []FoodOrder) ([]FoodOrder, error)
+	FindFoodById(ctx context.Context, foodId uint) (*Food, error)
 }
 
 type FormFoodOrder struct {

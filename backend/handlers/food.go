@@ -48,14 +48,6 @@ func (h *FoodHandlers) handleValidationError(ctx *fiber.Ctx, err error) error {
 					message = fmt.Sprintf("maximum character is 100")
 				}
 				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
-			case "Selled": 
-				switch err.Tag() {
-				case "required":
-					message = fmt.Sprint("you must add some number")
-				case "number":
-					message = fmt.Sprint("please give as some number")
-				}
-				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
 			}
 		}
 	}

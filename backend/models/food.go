@@ -37,7 +37,7 @@ func (e *Food) AfterFind(db *gorm.DB) (err error) {
 	var totalSelled int64
 	if err := db.Model(&FoodOrder{}).
 		Where("food_id = ?", e.Id).
-		Select("SUM(amount)").
+		Select("COALESCE(SUM(amount), 0)").
 		Scan(&totalSelled).Error; err != nil {
 		return err
 	}
