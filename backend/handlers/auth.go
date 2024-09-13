@@ -22,7 +22,7 @@ func (h *AuthHandler) handleError (ctx *fiber.Ctx, status int, message string) e
 
 func (h *AuthHandler) handleSucces (ctx *fiber.Ctx, status int, message string, data interface{}) error {
 	return ctx.Status(status).JSON(&fiber.Map{
-		"status" : "fail",
+		"status" : "success",
 		"message" : message,
 		"data" : data,
 	})
