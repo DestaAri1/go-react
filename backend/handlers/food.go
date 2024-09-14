@@ -41,11 +41,11 @@ func (h *FoodHandlers) handleValidationError(ctx *fiber.Ctx, err error) error {
 			case "Name":
 				switch err.Tag() {
 				case "required":
-					message = fmt.Sprintf("name field is required")
+					message = fmt.Errorf("name field is required").Error()
 				case "min":
-					message = fmt.Sprintf("minimum character is 4")
+					message = fmt.Errorf("minimum character is 4").Error()
 				case "max":
-					message = fmt.Sprintf("maximum character is 100")
+					message = fmt.Errorf("maximum character is 100").Error()
 				}
 				return h.respond(ctx, fiber.StatusBadRequest, message, nil)
 			}

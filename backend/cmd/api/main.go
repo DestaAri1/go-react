@@ -35,10 +35,11 @@ func main() {
 	//Routing
 	server := app.Group("/api")
 	handlers.NewAuthHandler(server.Group(("/auth")), authService)
-
+	
 	privateRoutes := server.Use(middlewares.AuthProtected(db))
-
+	
 	//Handlers
+	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
 	handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
 	handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)

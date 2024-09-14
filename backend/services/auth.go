@@ -18,7 +18,7 @@ type AuthService struct{
 	repository models.AuthRepository
 }
 
-func (s *AuthService) Login(ctx context.Context, loginData *models.AuthCredentials) (string, *models.User, error) {
+func (s *AuthService) Login(ctx context.Context, loginData *models.LoginCredentials) (string, *models.User, error) {
 	user, err := s.repository.GetUser(ctx, "email = ?", loginData.Email)
 
 	if err != nil {

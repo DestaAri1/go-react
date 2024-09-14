@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
-import Input from '../../components/Input';
+import { Link, useNavigate } from 'react-router-dom';
+import Input from '../../components/Input.js';
 import { login } from '../../services/authService';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false); // State untuk loading
+    const navigate = useNavigate();
   
     const handleChange = (e) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,12 +16,16 @@ export default function Login() {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
+      setLoading(true); // Mulai loading ketika request dimulai
+      setError(''); // Reset error sebelum mengirim request
       try {
         const data = await login(formData.email, formData.password);
         console.log(data); // Jika berhasil login, tangani responsnya
-        // Redirect atau simpan token di local storage
+        navigate('/'); // Redirect ke halaman setelah login
       } catch (err) {
         setError(err.message || 'Login failed'); // Tampilkan error
+      } finally {
+        setLoading(false); // Set loading menjadi false setelah respons diterima (baik success atau error)
       }
     };
   
@@ -45,8 +52,11 @@ export default function Login() {
             <button 
                 type="submit" 
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+                disabled={loading}
             >
-                Login
+            {loading ? (<LoadingSpinner/>) : (
+                'Login'
+            )}
             </button>
             </form>
             <p className="text-center text-sm mt-4">

@@ -53,6 +53,8 @@ func (h *FoodOrderHandler) respond(ctx *fiber.Ctx, status int, message string, d
 	var status2 string
 	if status == fiber.StatusOK || status == fiber.StatusCreated{
 		status2 = "success"
+	} else if status == fiber.StatusInternalServerError {
+		status2 = "error"
 	} else {
 		status2 = "fail"
 	}

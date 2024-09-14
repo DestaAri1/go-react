@@ -8,6 +8,7 @@ import (
 )
 
 type AuthCredentials struct {
+	Username string `json:"username" validate:"required"`
 	Email    string `json:"email" validate:"required,email,omitempty"`
 	Password string `json:"password" validate:"required"`
 }
@@ -17,8 +18,13 @@ type AuthRepository interface {
 	GetUser(ctx context.Context, query interface{}, args ...interface{}) (*User, error)
 }
 
+type LoginCredentials struct {
+    Email    string `json:"email" validate:"required,email"`
+    Password string `json:"password" validate:"required"`
+}
+
 type AuthServices interface {
-	Login(ctx context.Context, loginData *AuthCredentials) (string, *User, error)
+	Login(ctx context.Context, loginData *LoginCredentials) (string, *User, error)
 	Register(ctx context.Context, registerData *AuthCredentials) (string, *User, error)
 }
 
