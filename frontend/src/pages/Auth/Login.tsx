@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/Input.js';
 import { login } from '../../services/authService';
-import LoadingSpinner from '../../components/LoadingSpinner';
+import LoadingSpinner from '../../components/LoadingSpinner.js';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });

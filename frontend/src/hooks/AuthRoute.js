@@ -21,3 +21,7 @@ export const ProtectedRoute = ({children}) => {
   
   return <>{children}</>;
 }
+
+export const DeleteToken = function () {
+  Cookies.remove("token", {path : '/'})
+}
