@@ -1,37 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from './LoadingSpinner.js';
-import { DeleteToken } from '../hooks/AuthRoute.js';
+import useNavbarState from '../states/useNavbarState.tsx';
 
 export default function Navbar(props) {
-  const [token, setToken] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const navigate = useNavigate()
-
-  // Cek token di cookie
-  useEffect(() => {
-    const tokenFromCookie = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-    setToken(tokenFromCookie);
-    setIsLoading(false);
-  }, []);
-
-  const handleDropdownToggle = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    DeleteToken();
-    setToken(null);
-    setIsDropdownOpen(false);
-    setIsLoggingOut(false);
-    navigate("/login");
-  };
+  const {
+    token,
+    isDropdownOpen,
+    isLoading,
+    isLoggingOut,
+    handleDropdownToggle,
+    handleLogout
+  } = useNavbarState();  // Gunakan state dan handler dari custom hook
 
   return (
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
@@ -45,8 +27,7 @@ export default function Navbar(props) {
         </ul>
         <div className='w-[15%] flex justify-end'>
           {isLoading ? (
-            // Tampilkan spinner atau placeholder selama pengecekan token
-            <LoadingSpinner />
+            <LoadingSpinner />  // Tampilkan spinner jika sedang loading
           ) : token ? (
             <div className="relative">
               <div className='w-10 h-10 rounded-full cursor-pointer'>
