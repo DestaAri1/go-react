@@ -28,6 +28,7 @@ func main() {
 	authRepository := repository.NewAuthRepository(db)
 	foodRepository := repository.NewFoodRepositories(db)
 	foodOrderRepository := repository.NewFoodOrderRepository(db)
+	userRepository := repository.NewUserRepository(db)
 
 	//Service
 	authService := services.NewAuthService(authRepository)
@@ -40,6 +41,7 @@ func main() {
 	
 	//Handlers
 	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
+	handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository)
 	handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
 	handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)
