@@ -1,6 +1,7 @@
 package models
 
 import (
+	"context"
 	"time"
 
 	"gorm.io/gorm"
@@ -19,8 +20,19 @@ type User struct {
 	Email     string    `json:"email" gorm:"text;not null"`
 	Role      UserRole  `json:"role" gorm:"type:integer;default:1"`
 	Password  string    `json:"-"` //Do not compute the password in json
+	Image	  string	`json:"image"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type UserValidate struct {
+	Username  string	`json:"username" validate:"required"`
+	Password  string	`json:"-"`
+	Image	  string	`json:"image"`
+}
+
+type UserRepository interface {
+	UpdateUser(ctx context.Context, userId uint, updateData map[string]interface{}) (*User, error)
 }
 
 func (u *User) AfterCreate(db *gorm.DB) (err error) {
