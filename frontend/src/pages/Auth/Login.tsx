@@ -19,8 +19,7 @@ export default function Login() {
       setLoading(true); // Mulai loading ketika request dimulai
       setError(''); // Reset error sebelum mengirim request
       try {
-        const data = await login(formData.email, formData.password);
-        console.log(data); // Jika berhasil login, tangani responsnya
+        await login(formData.email, formData.password);
         navigate('/'); // Redirect ke halaman setelah login
       } catch (err) {
         setError(err.message || 'Login failed'); // Tampilkan error

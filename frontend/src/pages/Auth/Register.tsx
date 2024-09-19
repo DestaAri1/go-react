@@ -18,9 +18,8 @@ export default function Register() {
         e.preventDefault();
         setLoading(true); // Set loading menjadi true saat submit
         try {
-            const data = await register(formData.username, formData.email, formData.password);
-            console.log(data);
-            navigate('/'); // Redirect ke halaman setelah login
+            await register(formData.username, formData.email, formData.password);
+            navigate('/');
         } catch (err) {
           setError(err.message || 'Login failed'); // Tampilkan error
         } finally {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { getToken } from '../utils/AuthRoute';
 
 const API_URL = "http://localhost:3000/api"; // Ganti dengan URL API backend-mu
 
@@ -10,21 +11,21 @@ export const login = async (email, password) => {
       email,
       password,
     }, {
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        }
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      }
     });
-        // Jika login berhasil, ambil token dari response
-        const { token } = response.data.data;
 
-        // Simpan token ke dalam cookies
-        Cookies.set('token', token, { expires: 1 }); // Simpan token selama 7 hari
-    
-        return response.data;
-    // return response.data;  // Data yang diterima setelah login berhasil
+    const { token } = response.data.data;
+    Cookies.set('token', token, { expires: 1 }); // Simpan token selama 1 hari
+
+    return response.data;
   } catch (error) {
-    throw error.response.data; // Return error dari server
+    if (error.response) {
+      throw error.response.data; 
+    }
+    throw new Error("Network error");
   }
 };
 
@@ -32,24 +33,50 @@ export const login = async (email, password) => {
 export const register = async (username, email, password) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, {
-        username,
-        email,
-        password,
+      username,
+      email,
+      password,
     }, {
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        }
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      }
     });
-    // Jika login berhasil, ambil token dari response
-    const { token } = response.data.data;
 
-    // Simpan token ke dalam cookies
+    const { token } = response.data.data;
     Cookies.set('token', token, { expires: 1 }); // Simpan token selama 1 hari
 
-    return response.data; 
-    // return response.data; // Data yang diterima setelah registrasi berhasil
+    return response.data;
   } catch (error) {
-    throw error.response.data; // Return error dari server
+    if (error.response) {
+      throw error.response.data;
+    }
+    throw new Error("Network error");
+  }
+};
+
+// Fungsi untuk mendapatkan data user
+export const getUser = async () => {
+  try {
+    const token = getToken(); // Ambil token dari cookie
+
+    if (!token) {
+      throw new Error('Token is missing');
+    }
+
+    const response = await axios.get(`${API_URL}/auth/getUser`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,  // Sertakan token dalam header Authorization
+      },
+    });
+
+    return response.data.data; // Pastikan ini sesuai dengan struktur data respons
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+    throw new Error("Network error");
   }
 };

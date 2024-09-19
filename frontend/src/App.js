@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css';
 import Login from "./pages/Auth/Login.tsx";
 import Register from "./pages/Auth/Register.tsx";
-import { AuthRoute, ProtectedRoute } from "./hooks/AuthRoute.js";
+import { AuthRoute, ProtectedRoute } from "./utils/AuthRoute.js";
 import Home from "./pages/Home/Home.tsx";
 
 function App() {
