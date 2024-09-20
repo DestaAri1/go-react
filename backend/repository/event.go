@@ -11,10 +11,10 @@ type EventRepository struct{
 	db *gorm.DB
 }
 
-func (r *EventRepository) GetMany(ctx context.Context) ([]*models.Event, error) {
-	events := []*models.Event{}
+func (r *EventRepository) GetMany(ctx context.Context) ([]*models.EventResponse, error) {
+	events := []*models.EventResponse{}
 
-	res := r.db.Model(&models.Event{}).Order("updated_at desc").Find(&events)
+	res := r.db.Model(&models.Event{}).Select("id, name, location, date").Order("updated_at desc").Find(&events)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -22,6 +22,7 @@ func (r *EventRepository) GetMany(ctx context.Context) ([]*models.Event, error) 
 
 	return events, nil
 }
+
 func (r *EventRepository) GetOne(ctx context.Context, eventId uint) (*models.Event, error) {
 	event := &models.Event{}
 

@@ -13,13 +13,20 @@ type Event struct {
 	Location 				string 		`json:"location"`
 	TotalTicketsPurchased 	int64		`json:"totalTicketsPurchased" gorm:"-"`
 	TotalTicketsEntered 	int64		`json:"totalTicketsEntered" gorm:"-"`
-	Date     				time.Time 	`json:"date"`
+	Date     				time.Time 	`json:"date" gormL:"type:date"`
 	CreatedAt     			time.Time 	`json:"created_at"`
 	UpdatedAt     			time.Time 	`json:"updated_at"`
 }
 
+type EventResponse struct {
+	Id       uint      `json:"id"`
+	Name     string    `json:"name"`
+	Location string    `json:"location"`
+	Date     time.Time `json:"date"`
+}
+
 type EventRepository interface{
-	GetMany(ctx context.Context) ([]*Event, error)
+	GetMany(ctx context.Context) ([]*EventResponse, error)
 	GetOne(ctx context.Context, eventId uint) (*Event, error)
 	CreateOne(ctx context.Context, event *Event, formInput *FormEventInput) (*Event, error)
 	UpdateOne(ctx context.Context, eventId uint, updateData map[string]interface{}) (*Event, error)

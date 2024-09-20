@@ -1,6 +1,6 @@
 import React from 'react';
-import Navbar from '../../components/Navbar';
-import Footer from '../../components/Footer';
+import Navbar from '../../layouts/Navbar.jsx';
+import Footer from '../../layouts/Footer.jsx';
 import UpcomingConcerts from './Partials/UpcomingConcerts.tsx';
 
 export default function Home() {

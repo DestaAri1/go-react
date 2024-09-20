@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect} from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import LoadingSpinner from './LoadingSpinner';
-import useAuth from '../hooks/useAuth';
+import LoadingSpinner from '../components/LoadingSpinner.js';
+import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
 import useLoading from '../hooks/useLoading.js';
+import DropdownUser from './partials/DropdownUser.tsx';
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const { token, user, logout } = useAuth();
+  const { token, user } = useAuth();
   const { isDropdownOpen, toggleDropdown } = useDropdown();
-  const [ isLoggingOut, setIsLoggingOut ] = useState(false);
   const { isLoading, setLoading } = useLoading();
 
   // No need to set loading based on token here
@@ -20,16 +19,6 @@ export default function Navbar() {
       setLoading(false);
     }
   }, [token, setLoading]);
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true); // Start loading spinner
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate logout delay
-      logout(navigate); // Perform logout
-    } finally {
-      setIsLoggingOut(false); // Ensure loading spinner stops regardless of success or error
-    }
-  };
 
   return (
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
@@ -59,13 +48,7 @@ export default function Navbar() {
                 </div>
               )}
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
-                  <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</Link>
-                  <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Settings</Link>
-                  <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={handleLogout}>
-                    {isLoggingOut ? <LoadingSpinner color='text-gray-900' /> : "Sign Out"}
-                  </button>
-                </div>
+                <DropdownUser/>
               )}
             </div>
           ) : (
