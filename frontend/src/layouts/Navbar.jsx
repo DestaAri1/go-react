@@ -37,7 +37,7 @@ export default function Navbar() {
             <div className="relative">
               {user && user.image ? (
                 <img
-                  src={user.image}
+                  src={`http://127.0.0.1:3000/uploads/${user.image}`}
                   alt="Profile"
                   className="flex items-center w-10 h-10 rounded-full cursor-pointer"
                   onClick={toggleDropdown}

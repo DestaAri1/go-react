@@ -22,6 +22,8 @@ func main() {
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 	}))
 
+	app.Static("/uploads", "uploads")
+
 	//Repositories
 	eventRepository := repository.NewEventRepositories(db)
 	ticketRepository := repository.NewTicketRepository(db)
