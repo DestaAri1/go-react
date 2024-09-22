@@ -13,7 +13,7 @@ type Event struct {
 	Location 				string 		`json:"location"`
 	TotalTicketsPurchased 	int64		`json:"totalTicketsPurchased" gorm:"-"`
 	TotalTicketsEntered 	int64		`json:"totalTicketsEntered" gorm:"-"`
-	Date     				time.Time 	`json:"date" gormL:"type:date"`
+	Date     				time.Time 	`json:"date" gorm:"type:date"`
 	CreatedAt     			time.Time 	`json:"created_at"`
 	UpdatedAt     			time.Time 	`json:"updated_at"`
 }

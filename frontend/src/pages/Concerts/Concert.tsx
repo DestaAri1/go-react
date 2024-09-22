@@ -1,40 +1,55 @@
-import React, { useEffect } from 'react';
-import Navbar from '../../layouts/Navbar.jsx'; // Import komponen dari .jsx
-import useLoading from '../../hooks/useLoading.js';
-import useConcert from '../../hooks/useConcert.js';
-import Footer from '../../layouts/Footer.jsx';
-import ConsertList from './partials/ConsertList.jsx';
-
-interface ConcertList {
-  image: string;
-  name: string;
-  location: string;
-  date: string;
-}
+import React, { useEffect, useState } from 'react';
+import Navbar from '../../layouts/Navbar';
+import useLoading from '../../hooks/useLoading';
+import useConcert from '../../hooks/useConcert';
+import Footer from '../../layouts/Footer';
+import ConcertList from '../../components/ConcertList.jsx';
+import LoadingSpinner from '../../components/LoadingSpinner.js';
+import Pagination from '../../components/Pagination.jsx';
+import { typeConcert } from '../../types/typeConcert.tsx';
+import { getTotalPages, paginate } from '../../hooks/usePagination.tsx';
 
 export default function Concert() {
   const { isLoading, setLoading } = useLoading(true);
-  const dataConcert: ConcertList[] | null = useConcert(); // Tentukan tipe data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const dataConcert: typeConcert[] = useConcert() || [];
 
-  console.log(dataConcert);
-  
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage: number = 8;
 
   useEffect(() => {
-    if (dataConcert) {
-      setLoading(false); // Set loading ke false saat dataConcert tersedia
+    if (dataConcert.length > 0) {
+      setLoading(false);
     }
   }, [dataConcert, setLoading]);
 
-  return (
-    <div className='min-h-screen bg-gray-900 text-white flex flex-col'>
-      <Navbar />
+  const totalPages: number = getTotalPages(dataConcert, itemsPerPage);
+  
+  const paginatedConcerts: typeConcert[] = paginate(dataConcert, currentPage, itemsPerPage);
 
-      <div className='flex-grow mt-2'>
-        <h2 className="text-4xl font-semibold text-center mb-8">Upcoming Concerts</h2>
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+      <Navbar />
+      <div className="flex-grow mt-2 container mx-auto px-4">
+        <h2 className="text-4xl font-semibold text-center mb-8">Concert List</h2>
+        
         {isLoading ? (
-          <div className='text-white text-center'>Loading...</div>
+          <LoadingSpinner color="text-gray-500" />
         ) : (
-          <ConsertList concerts={dataConcert} />
+          <>
+            {dataConcert.length > 0 ? (
+              <>
+                <ConcertList concerts={paginatedConcerts} />
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            ) : (
+              <div className="text-center">No concerts available</div>
+            )}
+          </>
         )}
       </div>
       <Footer />
