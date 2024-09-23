@@ -21,6 +21,7 @@ export default function DropdownUser() {
   return (
     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
         <Link to="/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</Link>
+        <Link to="/tickets" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Tickets</Link>
         <Link to="/settings" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">Settings</Link>
         <button className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200" onClick={handleLogout}>
             {isLoading ? <LoadingSpinner color='text-gray-900' /> : "Sign Out"}

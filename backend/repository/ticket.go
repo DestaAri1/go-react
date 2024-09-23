@@ -14,7 +14,7 @@ type TickerRepository struct{
 func (r *TickerRepository) GetMany(ctx context.Context, userId uint) ([]*models.Ticket, error) {
 	tickets := []*models.Ticket{}
 
-	res := r.db.Model(&models.Ticket{}).Where("user_id = ?", userId).Joins("Event").Find(&tickets)
+	res := r.db.Preload("Event").Where("user_id = ?", userId).Joins("Event").Find(&tickets)
 
 	if res.Error != nil {
 		return nil, res.Error
@@ -27,7 +27,6 @@ func (r *TickerRepository) GetOne(ctx context.Context, userId uint, ticketId uin
 	ticket := &models.Ticket{}
 
 	res := r.db.Model(ticket).Where("id = ?", ticketId).Where("user_id = ?", userId).Preload("Event").First(ticket)
-	// res := r.db.Model(ticket).Joins("Event").Where("tickets.id = ?", ticketId).First(ticket)
 
 	if res.Error != nil {
 		return nil, res.Error

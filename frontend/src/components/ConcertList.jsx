@@ -2,13 +2,24 @@ import React from 'react';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 
-export default function ConcertList({ concerts, cols = 4 }) {
+export default function ConcertList({ concerts, cols = 4 }) { // Set default cols to 2 for desktop
   if (!Array.isArray(concerts) || concerts.length === 0) {
     return <div className='text-white text-center'>No concerts available</div>;
   }
 
+  const getGridCols = () => {
+    switch (cols) {
+      case 3:
+        return 'lg:grid-cols-3';
+      case 4:
+        return 'lg:grid-cols-4';
+      default:
+        return 'lg:grid-cols-4';
+    }
+  };
+
   return (
-    <div className={`container mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${cols} gap-6`}>
+    <div className={`container mx-auto grid grid-cols-1 md:grid-cols-2 ${getGridCols()} gap-6`}>
       {concerts.map((concert, index) => {
         const concertDate = parseISO(concert.date);
         const formattedDate = format(concertDate, 'dd MMMM yyyy', { locale: id });

@@ -15,7 +15,7 @@ type TicketHandler struct {
 	repository models.TicketRepository
 }
 
-func (h *TicketHandler) handlerError (ctx *fiber.Ctx, status int, message string) error {
+func (h *TicketHandler) handlerError(ctx *fiber.Ctx, status int, message string) error {
 	return ctx.Status(status).JSON(&fiber.Map{
 		"status": "fail",
 		"message" : message,

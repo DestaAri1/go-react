@@ -8,14 +8,16 @@ import useDropdown from '../hooks/useDropDown.js';
 import useLoading from '../hooks/useLoading.js';
 import DropdownUser from './partials/DropdownUser.tsx';
 
-export default function Navbar() {
+export default function Navbar({title = "Concert Tickets"}) {
   const { token, user } = useAuth();
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { isLoading, setLoading } = useLoading();
 
   // No need to set loading based on token here
   useEffect(() => {
-    if (token) {
+    if (!token) {
+      setLoading(true);
+    } else {
       setLoading(false);
     }
   }, [token, setLoading]);
@@ -23,7 +25,7 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
       <div className="container flex justify-between items-center">
-        <div className="text-white text-2xl font-bold w-[15%]">Concert Tickets</div>
+        <div className="text-white text-2xl font-bold w-[15%]">{title}</div>
         <ul className="flex space-x-6 w-[70%] justify-center">
           <li><Link to="/" className="text-white hover:text-indigo-500">Home</Link></li>
           <li><Link to="/concerts" className="text-white hover:text-indigo-500">Concerts</Link></li>

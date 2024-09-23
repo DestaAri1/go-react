@@ -1,7 +1,7 @@
 import { getToken } from '../utils/AuthRoute';
 import axios from 'axios';
 
-const API_URL = "http://localhost:3000/api"; // Ganti dengan URL API backend-mu
+const API_URL = "http://localhost:3000/api";
 const token = getToken()
 
 export const getAllConcert = async() => {
