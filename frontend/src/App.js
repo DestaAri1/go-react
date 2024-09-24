@@ -6,7 +6,8 @@ import Register from "./pages/Auth/Register.tsx";
 import { AuthRoute, ProtectedRoute } from "./utils/AuthRoute.js";
 import Home from "./pages/Home/Home.tsx";
 import Concert from "./pages/Concerts/Concert.tsx";
-import Tickets from "./pages/User/Tickets/Tickets.jsx";
+import Tickets from "./pages/User/Tickets/Tickets.tsx";
+import TicketsDetail from "./pages/User/Tickets/TicketsDetail.jsx";
 
 function App() {
   return (
@@ -18,8 +19,9 @@ function App() {
 
         {/* Halaman yang memerlukan auth */}
         <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
-        <Route path="/tickets" element={<ProtectedRoute><Tickets/></ProtectedRoute>}/>
         <Route path="/concerts" element={<ProtectedRoute><Concert/></ProtectedRoute>}/>
+        <Route path="/tickets" element={<ProtectedRoute><Tickets/></ProtectedRoute>}/>
+        <Route path="/tickets/:id" element={<ProtectedRoute><TicketsDetail/></ProtectedRoute>}/>
       </Routes>
     </BrowserRouter>
   );
