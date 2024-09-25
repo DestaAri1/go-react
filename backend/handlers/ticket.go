@@ -87,25 +87,40 @@ func (h *TicketHandler) GetOne(ctx *fiber.Ctx) error {
 }
 
 func (h *TicketHandler) CreateOne(ctx *fiber.Ctx) error {
-	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
-	defer cancel()
+    context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
+    defer cancel()
 
-	ticket := &models.Ticket{}
+    ticket := &models.Ticket{}
+	fmt.Println(ticket)
 
-	userId := uint(ctx.Locals("userId").(float64))
+    // Log body yang diterima dari Postman
+    if err := ctx.BodyParser(ticket); err != nil {
+        fmt.Println("Body parsing error:", err)  // Logging error parsing
+        return h.handlerError(ctx, fiber.StatusUnprocessableEntity, "Cannot parse body: "+err.Error())
+    }
+    
+    // Log ticket yang berhasil diparsing
+    fmt.Printf("Parsed Ticket: %+v\n", ticket)
 
-	if err := ctx.BodyParser(ticket); err != nil {
-		return h.handlerError(ctx, fiber.StatusUnprocessableEntity, err.Error())
-	}
+    // Ambil userId dari context
+    userId := ctx.Locals("userId")
+    if userId == nil {
+        return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
+    }
 
-	_, err := h.repository.CreateOne(context, ticket, userId)
+    userIdUint := uint(userId.(float64))
+    fmt.Printf("UserId: %d\n", userIdUint)
 
-	if err != nil {
-		return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
-	}
+    // Coba buat tiket baru
+    _, err := h.repository.CreateOne(context, ticket, userIdUint)
+    if err != nil {
+        fmt.Println("Error creating ticket:", err)  // Logging error dari repository
+        return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
+    }
 
-	return h.handlerSuccess(ctx, fiber.StatusOK, "Ticket has been created!", nil)
+    return h.handlerSuccess(ctx, fiber.StatusOK, "Ticket has been created!", nil)
 }
+
 
 func (h *TicketHandler) ValidateOne(ctx *fiber.Ctx) error {
     context, cancel := context.WithTimeout(context.Background(), time.Duration(10*time.Second)) // Increased timeout (adjust as needed)

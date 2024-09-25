@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/DestaAri1/go-react/models"
 	"gorm.io/gorm"
@@ -36,15 +37,18 @@ func (r *TickerRepository) GetOne(ctx context.Context, userId uint, ticketId uin
 } 
 
 func (r *TickerRepository) CreateOne(ctx context.Context, ticket *models.Ticket, userId uint) (*models.Ticket, error) {
-	ticket.UserId = userId
-	
-	res := r.db.Model(&models.Ticket{}).Create(ticket)
+    ticket.UserId = userId
+    
+    // Tambah log untuk memeriksa nilai dari tiket sebelum dibuat
+    fmt.Printf("Creating ticket with data: %+v\n", ticket)
 
-	if res.Error != nil {
-		return nil, res.Error
-	}
+    res := r.db.Model(&models.Ticket{}).Create(ticket)
+    if res.Error != nil {
+        fmt.Println("Error inserting ticket:", res.Error)  // Log error saat insert ke database
+        return nil, res.Error
+    }
 
-	return r.GetOne(ctx, ticket.Id, userId)
+    return r.GetOne(ctx, ticket.Id, userId)
 }
 
 func (r *TickerRepository) UpdateOne(ctx context.Context, userId uint, ticketId uint, updateData map[string]interface{}) (*models.Ticket, error) {

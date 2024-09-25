@@ -1,10 +1,32 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
+import useLoading from '../hooks/useLoading.js';
+import { useState } from 'react';
+import { createTicket } from '../services/tikcetService.js';
 
-export default function ConcertList({ concerts, cols = 4 }) { // Set default cols to 2 for desktop
+export default function ConcertList({ concerts, cols = 4 }) {
+  const [formData, setFormData] = useState({ id: '' });
+  const [error, setError] = useState();
+  const { isLoading, setLoading } = useLoading();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e, concertId) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await createTicket(concertId); // Pass the correct event ID
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Failed to create data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!Array.isArray(concerts) || concerts.length === 0) {
-    return <div className='text-white text-center'>No concerts available</div>;
+    return <div className="text-white text-center">No concerts available</div>;
   }
 
   const getGridCols = () => {
@@ -31,7 +53,11 @@ export default function ConcertList({ concerts, cols = 4 }) { // Set default col
               <h3 className="text-xl font-semibold mb-2">{concert.name}</h3>
               <h4 className="text-lg font-medium mb-2">{concert.location}</h4>
               <p className="text-gray-400 mb-4">Concert Date: {formattedDate}</p>
-              <button className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+              {/* Remove hidden input and handle concertId directly */}
+              <button
+                onClick={(e) => handleSubmit(e, concert.id)} // Pass concert.id directly to handleSubmit
+                className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
                 Buy Tickets
               </button>
             </div>

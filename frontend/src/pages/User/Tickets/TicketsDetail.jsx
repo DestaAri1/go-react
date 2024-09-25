@@ -14,7 +14,12 @@ const TicketDetail = () => {
         const data = await getOneTicket(id);  
         setTicketData(data.data.data);
       } catch (error) {
-        setError(error);
+        // Cek apakah error adalah masalah koneksi jaringan
+        if (!error.response) {
+          setError('Network error: Please check your internet connection.');
+        } else {
+          setError(error.message || 'An unexpected error occurred.');
+        }
       }
     };
 
