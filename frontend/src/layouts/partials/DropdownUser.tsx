@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import LoadingSpinner from '../../components/LoadingSpinner.js'
 import useLoading from '../../hooks/useLoading.js';
 import useAuth from '../../hooks/useAuth';
+import { showErrorToast } from '../../utils/Toast.js';
 
 export default function DropdownUser() {
     const navigate = useNavigate();
@@ -10,12 +11,15 @@ export default function DropdownUser() {
     const { logout } = useAuth();
 
     const handleLogout = async () => {
-        setLoading(true); // Start loading spinner
+        setLoading(true);
         try {
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate logout delay
-          logout(navigate); // Perform logout
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          window.location.reload();
+          logout(navigate);
+        } catch(e) {
+          showErrorToast(e.message)
         } finally {
-          setLoading(false); // Ensure loading spinner stops regardless of success or error
+          setLoading(false);
         }
       };
   return (

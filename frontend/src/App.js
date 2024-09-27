@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css';
-import Login from "./pages/Auth/Login.tsx";
-import Register from "./pages/Auth/Register.tsx";
+import Login from "./pages/Auth/Login.jsx";
+import Register from "./pages/Auth/Register.jsx";
 import { AuthRoute, ProtectedRoute } from "./utils/AuthRoute.js";
 import Home from "./pages/Home/Home.tsx";
 import Concert from "./pages/Concerts/Concert.tsx";

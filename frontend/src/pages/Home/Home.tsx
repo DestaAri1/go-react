@@ -6,18 +6,37 @@ import useConcert from '../../hooks/useConcert.js';
 import { typeConcert } from '../../types/typeConcert.js';
 import useLoading from '../../hooks/useLoading.js';
 import LoadingSpinner from '../../components/LoadingSpinner.js';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { showSuccessToast } from '../../utils/Toast.js';
 
 export default function Home() {
   const { isLoading, setLoading } = useLoading(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const location = useLocation();
+  const message = location.state?.message; // Dapatkan pesan dari state
   const dataConcert: typeConcert[] = useConcert() || [];
 
   useEffect(() => {
+    // Menangani pengambilan data konser
     if (dataConcert.length > 0) {
       setLoading(false);
     }
   }, [dataConcert, setLoading]);
+  
+  useEffect(() => {
+    // Menangani notifikasi
+    const hasShownToast = localStorage.getItem('hasShownToast');
+  
+    if (message && !hasShownToast) {
+      showSuccessToast(message);
+      localStorage.setItem('hasShownToast', 'true');
+    }
+  
+    // Reset status saat keluar dari halaman
+    return () => {
+      localStorage.removeItem('hasShownToast');
+    };
+  }, [message]);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col justify-between">
       <Navbar />
@@ -39,9 +58,9 @@ export default function Home() {
           <LoadingSpinner color="text-gray-500" />
         ) : (
           <ConcertList
-          concerts={dataConcert.slice(0, 3)}
-          cols={3}
-        />
+            concerts={dataConcert.slice(0, 3)}
+            cols={3}
+          />
         )}
       </div>
 

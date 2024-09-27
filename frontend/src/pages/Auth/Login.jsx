@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/Input.js';
 import { login } from '../../services/authService';
 import LoadingSpinner from '../../components/LoadingSpinner.js';
+import { showErrorToast } from '../../utils/Toast.js';
+import { ToastContainer } from 'react-toastify';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // State untuk loading
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
   
     const handleChange = (e) => {
@@ -16,15 +18,16 @@ export default function Login() {
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-      setLoading(true); // Mulai loading ketika request dimulai
-      setError(''); // Reset error sebelum mengirim request
+      setLoading(true);
+      setError('');
       try {
         await login(formData.email, formData.password);
-        navigate('/'); // Redirect ke halaman setelah login
+        window.location.reload();
+        navigate('/', { state: { message: 'Login success! Welcome back my lord.' }});
       } catch (err) {
-        setError(err.message || 'Login failed'); // Tampilkan error
+        showErrorToast(err.message || "Failed logged in")
       } finally {
-        setLoading(false); // Set loading menjadi false setelah respons diterima (baik success atau error)
+        setLoading(false);
       }
     };
   
@@ -32,7 +35,6 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
             <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-            {error && <p className="text-red-500 text-center">{error}</p>}
             <form onSubmit={handleSubmit}>
             <Input 
                 label="Email" 
@@ -62,6 +64,7 @@ export default function Login() {
             Don't have an account? <Link to="/register" className="text-blue-500">Register</Link>
             </p>
         </div>
+        <ToastContainer />
     </div>
     );
 };

@@ -91,34 +91,26 @@ func (h *TicketHandler) CreateOne(ctx *fiber.Ctx) error {
     defer cancel()
 
     ticket := &models.Ticket{}
-	fmt.Println(ticket)
 
-    // Log body yang diterima dari Postman
+	fmt.Println("humu",ticket)
+
     if err := ctx.BodyParser(ticket); err != nil {
-        fmt.Println("Body parsing error:", err)  // Logging error parsing
         return h.handlerError(ctx, fiber.StatusUnprocessableEntity, "Cannot parse body: "+err.Error())
     }
-    
-    // Log ticket yang berhasil diparsing
-    fmt.Printf("Parsed Ticket: %+v\n", ticket)
 
-    // Ambil userId dari context
     userId := ctx.Locals("userId")
     if userId == nil {
         return h.handlerError(ctx, fiber.StatusUnauthorized, "Unauthorized, userId not found")
     }
 
     userIdUint := uint(userId.(float64))
-    fmt.Printf("UserId: %d\n", userIdUint)
 
-    // Coba buat tiket baru
-    _, err := h.repository.CreateOne(context, ticket, userIdUint)
+    createdTicket, err := h.repository.CreateOne(context, ticket, userIdUint)
     if err != nil {
-        fmt.Println("Error creating ticket:", err)  // Logging error dari repository
         return h.handlerError(ctx, fiber.StatusBadGateway, err.Error())
     }
 
-    return h.handlerSuccess(ctx, fiber.StatusOK, "Ticket has been created!", nil)
+    return h.handlerSuccess(ctx, fiber.StatusCreated, "Ticket has been created!", createdTicket)
 }
 
 

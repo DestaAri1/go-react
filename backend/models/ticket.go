@@ -8,7 +8,7 @@ import (
 type Ticket struct {
 	Id        uint      `json:"id" gorm:"primarykey"`
 	EventId   uint      `json:"event_id"`
-	UserId    uint      `json:"userId" gorm:"foreignkey:UserId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	UserId    uint      `json:"userId"`
 	Event     Event     `json:"event" gorm:"foreignkey:EventId;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Entered   bool      `json:"entered" default:"false"`
 	CreatedAt time.Time `json:"created_at"`

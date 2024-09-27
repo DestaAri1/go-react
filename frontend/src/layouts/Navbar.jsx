@@ -7,6 +7,7 @@ import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
 import useLoading from '../hooks/useLoading.js';
 import DropdownUser from './partials/DropdownUser.tsx';
+import { getUser } from '../services/authService.js';
 
 export default function Navbar({title = "Concert Tickets"}) {
   const { token, user } = useAuth();
@@ -15,6 +16,7 @@ export default function Navbar({title = "Concert Tickets"}) {
 
   // No need to set loading based on token here
   useEffect(() => {
+    getUser()
     if (!token) {
       setLoading(true);
     } else {

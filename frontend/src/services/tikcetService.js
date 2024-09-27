@@ -36,16 +36,10 @@ export const getOneTicket = async(id) => {
 }
 
 export const createTicket = async(eventId) => {
-  const formData = {
-    eventId: eventId, // Kirim EventId dari React
-    // Anda bisa menambahkan UserId di backend berdasarkan token autentikasi jika dibutuhkan
-  };
-
-  console.log("ticket service :",formData);
   
   try {
     const response = await axios.post(`${API_URL}/ticket`, {
-      formData
+      eventId
     },{
       headers:header
     })

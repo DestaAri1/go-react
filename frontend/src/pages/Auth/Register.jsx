@@ -3,6 +3,8 @@ import Input from '../../components/Input';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '../../services/authService';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { showErrorToast } from '../../utils/Toast';
+import { ToastContainer } from 'react-toastify';
 
 export default function Register() {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' });
@@ -19,11 +21,11 @@ export default function Register() {
         setLoading(true); // Set loading menjadi true saat submit
         try {
             await register(formData.username, formData.email, formData.password);
-            navigate('/');
+            navigate('/', { state: { message: `Account successfully created` }});
         } catch (err) {
-          setError(err.message || 'Login failed'); // Tampilkan error
+            showErrorToast(err.message || "Failed register")
         } finally {
-          setLoading(false); // Set loading menjadi false setelah respons diterima (baik success atau error)
+            setLoading(false); // Set loading menjadi false setelah respons diterima (baik success atau error)
         }
     };
 
@@ -31,7 +33,6 @@ export default function Register() {
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
                 <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
-                {error && <p className="text-red-500 text-center">{error}</p>}
                 <form onSubmit={handleSubmit}>
                     <Input
                         label="Username"
@@ -68,6 +69,7 @@ export default function Register() {
                     Already have an account? <Link to="/login" className="text-blue-500">Login</Link>
                 </p>
             </div>
+            <ToastContainer />
         </div>
     );
 }

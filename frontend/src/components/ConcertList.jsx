@@ -2,13 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import useLoading from '../hooks/useLoading.js';
-import { useState } from 'react';
 import { createTicket } from '../services/tikcetService.js';
+import { ToastContainer } from 'react-toastify';
+import { showErrorToast, showSuccessToast } from '../utils/Toast.js';
+import LoadingSpinner from './LoadingSpinner.js';
 
 export default function ConcertList({ concerts, cols = 4 }) {
-  const [formData, setFormData] = useState({ id: '' });
-  const [error, setError] = useState();
-  const { isLoading, setLoading } = useLoading();
+  const { isLoading, setLoading } = useLoading(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e, concertId) => {
@@ -16,10 +16,11 @@ export default function ConcertList({ concerts, cols = 4 }) {
     setLoading(true);
 
     try {
-      await createTicket(concertId); // Pass the correct event ID
+      const response = await createTicket(concertId);
+      showSuccessToast(response.data.message);
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Failed to create data');
+      showErrorToast(`Error: ${err.message || 'Failed to create ticket'}`);
     } finally {
       setLoading(false);
     }
@@ -53,17 +54,19 @@ export default function ConcertList({ concerts, cols = 4 }) {
               <h3 className="text-xl font-semibold mb-2">{concert.name}</h3>
               <h4 className="text-lg font-medium mb-2">{concert.location}</h4>
               <p className="text-gray-400 mb-4">Concert Date: {formattedDate}</p>
-              {/* Remove hidden input and handle concertId directly */}
               <button
-                onClick={(e) => handleSubmit(e, concert.id)} // Pass concert.id directly to handleSubmit
-                className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                onClick={(e) => handleSubmit(e, concert.id)}
+                className={`bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors
+                ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isLoading}
               >
-                Buy Tickets
+                {isLoading ? (<LoadingSpinner/>) : 'Buy Tickets'}
               </button>
             </div>
           </div>
         );
       })}
+      <ToastContainer />
     </div>
   );
 }
