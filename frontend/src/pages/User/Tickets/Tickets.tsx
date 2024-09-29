@@ -11,7 +11,7 @@ export default function Tickets() {
   const dataTicket = useTicket() || [];
 
   useEffect(() => {
-    if (dataTicket.length > 0) {
+    if (dataTicket.length >= 0) {
       setLoading(false);
     }
   }, [dataTicket, setLoading]);

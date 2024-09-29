@@ -8,7 +8,6 @@ import { ToastContainer } from 'react-toastify';
 
 export default function Register() {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false); // State untuk loading
     const navigate = useNavigate();
 
@@ -21,6 +20,7 @@ export default function Register() {
         setLoading(true); // Set loading menjadi true saat submit
         try {
             await register(formData.username, formData.email, formData.password);
+            window.location.reload()
             navigate('/', { state: { message: `Account successfully created` }});
         } catch (err) {
             showErrorToast(err.message || "Failed register")

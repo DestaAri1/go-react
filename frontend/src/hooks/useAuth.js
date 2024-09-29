@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getUser } from '../services/authService';
-import { DeleteToken, getToken } from '../utils/AuthRoute';
+import { DeleteToken, getToken } from '../utils/AuthRoute.js';
 
 export default function useAuth() {
   const [token, setToken] = useState(null);
@@ -13,7 +13,10 @@ export default function useAuth() {
     if (tokenFromCookie) {
       getUser()
         .then((userData) => setUser(userData))
-        .catch((error) => console.error("Failed to fetch user data:", error));
+        .catch((error) => {
+          console.error("Failed to fetch user data:", error);
+          DeleteToken();
+        });
     }
   }, []);
 
@@ -27,6 +30,7 @@ export default function useAuth() {
   return {
     token,
     user,
+    setUser,
     logout
   };
 }

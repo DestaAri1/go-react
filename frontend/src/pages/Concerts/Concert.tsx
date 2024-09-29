@@ -18,7 +18,7 @@ export default function Concert() {
   const itemsPerPage: number = 8;
 
   useEffect(() => {
-    if (dataConcert.length > 0) {
+    if (dataConcert.length >= 0) {
       setLoading(false);
     }
   }, [dataConcert, setLoading]);

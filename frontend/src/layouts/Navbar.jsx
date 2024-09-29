@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
@@ -6,23 +6,30 @@ import LoadingSpinner from '../components/LoadingSpinner.js';
 import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
 import useLoading from '../hooks/useLoading.js';
-import DropdownUser from './partials/DropdownUser.tsx';
+import DropdownUser from './partials/DropdownUser.jsx';
 import { getUser } from '../services/authService.js';
+import { DeleteToken } from '../utils/AuthRoute.js';
 
-export default function Navbar({title = "Concert Tickets"}) {
-  const { token, user } = useAuth();
+export default function Navbar({ title = "Concert Tickets" }) {
+  const { token, user, setUser } = useAuth();
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const { isLoading, setLoading } = useLoading();
 
-  // No need to set loading based on token here
   useEffect(() => {
-    getUser()
-    if (!token) {
+    if (token && !user) { // Hanya fetch jika token ada dan user belum di-fetch
       setLoading(true);
-    } else {
-      setLoading(false);
+      getUser()
+        .then((fetchedUser) => {
+          setUser(fetchedUser);
+        })
+        .catch((e) => {
+          DeleteToken();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-  }, [token, setLoading]);
+  }, [token, user, setUser, setLoading]);
 
   return (
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
@@ -51,8 +58,8 @@ export default function Navbar({title = "Concert Tickets"}) {
                   <FontAwesomeIcon icon={faUser} onClick={toggleDropdown} />
                 </div>
               )}
-              {isDropdownOpen && (
-                <DropdownUser/>
+              {isDropdownOpen && user && (
+                <DropdownUser user={user} />
               )}
             </div>
           ) : (

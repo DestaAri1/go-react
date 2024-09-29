@@ -17,7 +17,8 @@ export default function Home() {
 
   useEffect(() => {
     // Menangani pengambilan data konser
-    if (dataConcert.length > 0) {
+    if (dataConcert.length >= 0) {
+      // Set loading ke false baik ketika data ada atau tidak
       setLoading(false);
     }
   }, [dataConcert, setLoading]);
@@ -43,7 +44,9 @@ export default function Home() {
       {/* Hero Section */}
       <div
         className="bg-cover bg-center h-96"
-        style={{ backgroundImage: `url('/concert.jpg')` }}>
+        style={{ backgroundImage: `url('/concert.jpg')` }}
+        role="img"
+        aria-label="Concert background">
         <div className="h-full bg-black bg-opacity-60 flex flex-col justify-center items-center">
           <h1 className="text-5xl font-bold mb-4">Welcome to Concert Tickets</h1>
           <p className="text-lg mb-6">Book your favorite concert tickets now!</p>
@@ -52,15 +55,20 @@ export default function Home() {
           </Link>
         </div>
       </div>
+      
       <div className='py-12'>
         <h2 className="text-4xl font-semibold text-center mb-8">Upcoming Concerts</h2>
         {isLoading ? (
           <LoadingSpinner color="text-gray-500" />
         ) : (
-          <ConcertList
-            concerts={dataConcert.slice(0, 3)}
-            cols={3}
-          />
+          dataConcert.length > 0 ? (
+            <ConcertList
+              concerts={dataConcert.slice(0, 3)}
+              cols={3}
+            />
+          ) : (
+            <div className="text-center">No concerts available</div>
+          )
         )}
       </div>
 

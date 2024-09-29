@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Input = ({ label, type, name, value, onChange }) => {
+const Input = ({ label, label_color = "text-gray-700", type, name, value, onChange }) => {
   return (
     <div className="mb-4">
-      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={name}>
+      <label className={`block ${label_color} text-sm font-bold mb-2`} htmlFor={name}>
         {label}
       </label>
       <input

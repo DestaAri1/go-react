@@ -8,7 +8,6 @@ import { ToastContainer } from 'react-toastify';
 
 export default function Login() {
     const [formData, setFormData] = useState({ email: '', password: '' });
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
   
@@ -19,7 +18,6 @@ export default function Login() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
-      setError('');
       try {
         await login(formData.email, formData.password);
         window.location.reload();
