@@ -64,10 +64,21 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
     if !ok {
         return h.response(ctx, fiber.StatusUnauthorized, "User not found", nil)
     }
-
+    
     // Create a map to hold the update data
     updateData := make(map[string]interface{})
+    
+    // Validate the update data
+    formData := &models.UserValidate{}
+    if err := mapstructure.Decode(updateData, formData); err != nil {
+        return h.response(ctx, fiber.StatusUnprocessableEntity, "Invalid input", nil)
+    }
 
+    validate := validator.New()
+    if err := validate.Struct(formData); err != nil {
+        return h.handleValidationError(ctx, err)
+    }
+    
     // Parse form fields
     if form, err := ctx.MultipartForm(); err == nil {
         for key, values := range form.Value {
@@ -124,16 +135,6 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
     // Log the update data for debugging
     log.Printf("Update data: %+v", updateData)
 
-    // Validate the update data
-    formData := &models.UserValidate{}
-    if err := mapstructure.Decode(updateData, formData); err != nil {
-        return h.response(ctx, fiber.StatusUnprocessableEntity, "Invalid input", nil)
-    }
-
-    validate := validator.New()
-    if err := validate.Struct(formData); err != nil {
-        return h.handleValidationError(ctx, err)
-    }
 
     // Update user in repository
     updateUser, err := h.repository.UpdateUser(context, uint(userId), updateData)

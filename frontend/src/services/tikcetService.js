@@ -36,7 +36,6 @@ export const getOneTicket = async(id) => {
 }
 
 export const createTicket = async(eventId) => {
-  
   try {
     const response = await axios.post(`${API_URL}/ticket`, {
       eventId

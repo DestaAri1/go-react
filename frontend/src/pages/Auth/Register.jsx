@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 
 export default function Register() {
     const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-    const [loading, setLoading] = useState(false); // State untuk loading
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -17,7 +17,7 @@ export default function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Set loading menjadi true saat submit
+        setLoading(true);
         try {
             await register(formData.username, formData.email, formData.password);
             window.location.reload()

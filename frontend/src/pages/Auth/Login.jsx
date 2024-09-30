@@ -1,33 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../../components/Input.js';
-import { login } from '../../services/authService';
 import LoadingSpinner from '../../components/LoadingSpinner.js';
 import { showErrorToast } from '../../utils/Toast.js';
 import { ToastContainer } from 'react-toastify';
+import useAuth from '../../hooks/useAuth';
 
 export default function Login() {
-    const [formData, setFormData] = useState({ email: '', password: '' });
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-  
-    const handleChange = (e) => {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      try {
-        await login(formData.email, formData.password);
-        window.location.reload();
-        navigate('/', { state: { message: 'Login success! Welcome back my lord.' }});
-      } catch (err) {
-        showErrorToast(err.message || "Failed logged in")
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await login(formData.email, formData.password);
+      navigate('/', { state: { message: 'Login success! Welcome back my lord.' }});
+    } catch (err) {
+      showErrorToast(err.message || "Failed to log in");
+    } finally {
+      setLoading(false);
+    }
+  };
   
     return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">

@@ -12,13 +12,11 @@ import { showSuccessToast } from '../../utils/Toast.js';
 export default function Home() {
   const { isLoading, setLoading } = useLoading(true);
   const location = useLocation();
-  const message = location.state?.message; // Dapatkan pesan dari state
+  const message = location.state?.message;
   const dataConcert: typeConcert[] = useConcert() || [];
 
   useEffect(() => {
-    // Menangani pengambilan data konser
     if (dataConcert.length >= 0) {
-      // Set loading ke false baik ketika data ada atau tidak
       setLoading(false);
     }
   }, [dataConcert, setLoading]);

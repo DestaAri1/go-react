@@ -26,7 +26,7 @@ type User struct {
 }
 
 type UserValidate struct {
-	Username  string	`json:"username" validate:"required"`
+	Username  string	`json:"username"`
 	Password  string	`json:"-"`
 	Image	  string	`json:"image"`
 }

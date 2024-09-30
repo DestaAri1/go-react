@@ -1,36 +1,39 @@
 import { useEffect, useState } from 'react';
-import { getUser } from '../services/authService';
-import { DeleteToken, getToken } from '../utils/AuthRoute.js';
+import { getUser, GetToken, removeToken, setToken } from '../services/authService';
 
 export default function useAuth() {
-  const [token, setToken] = useState(null);
+  const [token, setTokenState] = useState(GetToken());
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const tokenFromCookie = getToken();
-    setToken(tokenFromCookie);
-
-    if (tokenFromCookie) {
+    if (token) {
       getUser()
         .then((userData) => setUser(userData))
         .catch((error) => {
           console.error("Failed to fetch user data:", error);
-          DeleteToken();
+          logout();
         });
     }
-  }, []);
+  }, [token]);
 
-  const logout = (navigate) => {
-    DeleteToken();
-    setToken(null);
+  const login = async (email, password) => {
+    const response = await login(email, password);
+    setToken(response.data.token);
+    setTokenState(response.data.token);
+    setUser(response.data.user);
+  };
+
+  const logout = () => {
+    removeToken();
+    setTokenState(null);
     setUser(null);
-    navigate("/login");
   };
 
   return {
     token,
     user,
     setUser,
+    login,
     logout
   };
 }

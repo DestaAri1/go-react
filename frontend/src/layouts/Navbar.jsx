@@ -1,35 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '../components/LoadingSpinner.js';
 import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
-import useLoading from '../hooks/useLoading.js';
 import DropdownUser from './partials/DropdownUser.jsx';
-import { getUser } from '../services/authService.js';
-import { DeleteToken } from '../utils/AuthRoute.js';
 
 export default function Navbar({ title = "Concert Tickets" }) {
-  const { token, user, setUser } = useAuth();
+  const { token, user, setUser, logout } = useAuth();
   const { isDropdownOpen, toggleDropdown } = useDropdown();
-  const { isLoading, setLoading } = useLoading();
+  const [isLoading, setIsLoading] = useState(false);
+  const [profileImageKey, setProfileImageKey] = useState(Date.now());
+
+  // Function to refresh profile image
+  const refreshProfileImage = useCallback(() => {
+    setProfileImageKey(Date.now());
+  }, []);
+
+  // Listen for custom event to refresh profile image
+  useEffect(() => {
+    window.addEventListener('refreshProfileImage', refreshProfileImage);
+    return () => {
+      window.removeEventListener('refreshProfileImage', refreshProfileImage);
+    };
+  }, [refreshProfileImage]);
+
+  // Function to update user data
+  const updateUserData = useCallback((newUserData) => {
+    setUser(newUserData);
+    refreshProfileImage();
+  }, [setUser]);
 
   useEffect(() => {
-    if (token && !user) { // Hanya fetch jika token ada dan user belum di-fetch
-      setLoading(true);
-      getUser()
-        .then((fetchedUser) => {
-          setUser(fetchedUser);
-        })
-        .catch((e) => {
-          DeleteToken();
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [token, user, setUser, setLoading]);
+    // This effect will run when the component mounts and whenever token or user changes
+    // The actual user fetching logic is handled in the useAuth hook
+    setIsLoading(!user && !!token);
+  }, [user, token]);
 
   return (
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
@@ -44,11 +51,11 @@ export default function Navbar({ title = "Concert Tickets" }) {
         <div className='w-[15%] flex justify-end'>
           {isLoading ? (
             <LoadingSpinner />
-          ) : token ? (
+          ) : token && user ? (
             <div className="relative">
-              {user && user.image ? (
+              {user.image ? (
                 <img
-                  src={`http://127.0.0.1:3000/uploads/${user.image}`}
+                  src={`http://127.0.0.1:3000/uploads/${user.image}?${profileImageKey}`}
                   alt="Profile"
                   className="flex items-center w-10 h-10 rounded-full cursor-pointer"
                   onClick={toggleDropdown}
@@ -58,8 +65,8 @@ export default function Navbar({ title = "Concert Tickets" }) {
                   <FontAwesomeIcon icon={faUser} onClick={toggleDropdown} />
                 </div>
               )}
-              {isDropdownOpen && user && (
-                <DropdownUser user={user} />
+              {isDropdownOpen && (
+                <DropdownUser user={user} updateUserData={updateUserData} logout={logout} />
               )}
             </div>
           ) : (
