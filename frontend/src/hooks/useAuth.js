@@ -1,8 +1,9 @@
+// useAuth.js
 import { useEffect, useState } from 'react';
-import { getUser, GetToken, removeToken, setToken } from '../services/authService';
+import { getUser, getToken, removeToken, setToken, login as authLogin } from '../services/authService.js';
 
 export default function useAuth() {
-  const [token, setTokenState] = useState(GetToken());
+  const [token, setTokenState] = useState(getToken());
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -17,7 +18,7 @@ export default function useAuth() {
   }, [token]);
 
   const login = async (email, password) => {
-    const response = await login(email, password);
+    const response = await authLogin(email, password);
     setToken(response.data.token);
     setTokenState(response.data.token);
     setUser(response.data.user);

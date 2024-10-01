@@ -7,8 +7,13 @@ export default function useDropdown() {
     setIsDropdownOpen(prev => !prev);
   };
 
+  const closeDropdown = () => {
+    setIsDropdownOpen(false);
+  };
+
   return {
     isDropdownOpen,
-    toggleDropdown
+    toggleDropdown,
+    closeDropdown
   };
 }

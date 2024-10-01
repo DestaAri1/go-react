@@ -1,6 +1,7 @@
 import React from 'react'
 import { Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import useAuth from '../hooks/useAuth';
 
 export const getToken = function () {
   return Cookies.get('token')
@@ -16,9 +17,20 @@ export const AuthRoute = ({children}) => {
 
 export const ProtectedRoute = ({children}) =>  {
   if (!getToken()) {
-    return <Navigate to="/login" />; // Redirect ke login jika token tidak ada
+    return <Navigate to="/login" />;
   }
   
+  return <>{children}</>;
+}
+
+export const AdminRoute = ({children}) => {
+  const {user} = useAuth()
+
+  // Periksa apakah user sudah ada dan apakah role-nya adalah admin (role 0)
+  if (user && user.role !== 0) {
+    return <Navigate to="/" />; // Redirect jika bukan admin
+  }
+
   return <>{children}</>;
 }
 

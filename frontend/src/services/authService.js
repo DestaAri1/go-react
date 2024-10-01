@@ -1,11 +1,28 @@
+// authService.js
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { getToken } from '../utils/AuthRoute';
 
-const API_URL = "http://localhost:3000/api"; // Ganti dengan URL API backend-mu
-const token = getToken()
+const API_URL = "http://localhost:3000/api"; 
 
-// Fungsi untuk login
+export const getToken = () => {
+  return Cookies.get('token') || localStorage.getItem('token');
+};
+
+export const setToken = (token) => {
+  Cookies.set('token', token, {
+    expires: 1, // Expires in 1 day
+    path: '/',
+    sameSite: 'Strict',
+    secure: process.env.NODE_ENV === 'production' // Use secure flag in production
+  });
+  localStorage.setItem('token', token);
+};
+
+export const removeToken = () => {
+  Cookies.remove('token', { path: '/' });
+  localStorage.removeItem('token');
+};
+
 export const login = async (email, password) => {
   try {
     const response = await axios.post(`${API_URL}/auth/login`, {
@@ -19,8 +36,6 @@ export const login = async (email, password) => {
     });
 
     const { token } = response.data.data;
-    
-    // Set the token in both cookie and localStorage
     setToken(token);
 
     return response.data;
@@ -30,25 +45,6 @@ export const login = async (email, password) => {
     }
     throw new Error("Network error");
   }
-};
-
-export const setToken = (token) => {
-  Cookies.set('token', token, { 
-    expires: 1, // Expires in 1 day
-    path: '/',
-    sameSite: 'Strict',
-    secure: process.env.NODE_ENV === 'production' // Use secure flag in production
-  });
-  localStorage.setItem('token', token);
-};
-
-export const GetToken = () => {
-  return Cookies.get('token') || localStorage.getItem('token');
-};
-
-export const removeToken = () => {
-  Cookies.remove('token', { path: '/' });
-  localStorage.removeItem('token');
 };
 
 export const getUser = async () => {
@@ -69,7 +65,7 @@ export const getUser = async () => {
     throw error;
   }
 };
-// Fungsi untuk registrasi
+
 export const register = async (username, email, password) => {
   try {
     const response = await axios.post(`${API_URL}/auth/register`, {
@@ -84,7 +80,7 @@ export const register = async (username, email, password) => {
     });
 
     const { token } = response.data.data;
-    Cookies.set('token', token, { expires: 1 }); // Simpan token selama 1 hari
+    setToken(token);
 
     return response.data;
   } catch (error) {
@@ -97,19 +93,19 @@ export const register = async (username, email, password) => {
 
 export const updateUser = async (username, password, image) => {
   const formData = new FormData();
-  
   formData.append('username', username);
   formData.append('password', password);
   if (image) {
-    formData.append('image', image);  // Menambahkan gambar hanya jika ada
+    formData.append('image', image);
   }
 
   try {
+    const token = getToken();
     const response = await axios.put(`${API_URL}/user/update_profile`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Accept: "application/json",
-        Authorization: `Bearer ${token}`,  // Pastikan token ada di sini
+        Authorization: `Bearer ${token}`,
       },
     });
 

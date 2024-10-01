@@ -43,7 +43,7 @@ func main() {
 	
 	//Handlers
 	handlers.NewGetUserHandler(privateRoutes.Group("/auth"), authRepository)
-	handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository)
+	handlers.NewUserHandler(privateRoutes.Group("/user"), userRepository, authRepository)
 	handlers.NewEventHandler(privateRoutes.Group("/event"), eventRepository)
 	handlers.NewTicketHandler(privateRoutes.Group("/ticket"), ticketRepository)
 	handlers.NewFoodHandler(privateRoutes.Group("/food"),db, foodRepository)

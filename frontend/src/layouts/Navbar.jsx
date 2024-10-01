@@ -8,7 +8,7 @@ import useDropdown from '../hooks/useDropDown.js';
 import DropdownUser from './partials/DropdownUser.jsx';
 
 export default function Navbar({ title = "Concert Tickets" }) {
-  const { token, user, setUser, logout } = useAuth();
+  const { token, user, setUser } = useAuth();
   const { isDropdownOpen, toggleDropdown } = useDropdown();
   const [isLoading, setIsLoading] = useState(false);
   const [profileImageKey, setProfileImageKey] = useState(Date.now());
@@ -66,7 +66,7 @@ export default function Navbar({ title = "Concert Tickets" }) {
                 </div>
               )}
               {isDropdownOpen && (
-                <DropdownUser user={user} updateUserData={updateUserData} logout={logout} />
+                <DropdownUser user={user} updateUserData={updateUserData} />
               )}
             </div>
           ) : (

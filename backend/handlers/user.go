@@ -18,6 +18,7 @@ import (
 
 type UserHandler struct {
 	repository models.UserRepository
+    authRepository models.AuthRepository
 }
 
 func (h *UserHandler) response(ctx *fiber.Ctx, status int, message string, data interface{}) error {
@@ -93,6 +94,14 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
         }
     }
 
+    // Get the current user data to check for existing image
+    currentUser, err := h.authRepository.GetUser(context, "id = ?", uint(userId))
+    if err != nil {
+        return h.response(ctx, fiber.StatusInternalServerError, "Failed to get current user data", nil)
+    }
+
+    log.Println("Cur User: ", currentUser)
+
     // Handle file upload
     file, err := ctx.FormFile("image")
     if err == nil {
@@ -118,6 +127,15 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
             return h.response(ctx, fiber.StatusInternalServerError, "Failed to create uploads directory", nil)
         }
 
+        // Delete the old image if it exists
+        if currentUser.Image != "" {
+            oldImagePath := filepath.Join(uploadsDir, currentUser.Image)
+            if err := os.Remove(oldImagePath); err != nil && !os.IsNotExist(err) {
+                log.Printf("Failed to delete old image: %v", err)
+                // We don't return here, as we still want to save the new image
+            }
+        }
+
         // Save the uploaded file to disk
         filePath := filepath.Join(uploadsDir, imageFileName)
         if err := ctx.SaveFile(file, filePath); err != nil {
@@ -135,7 +153,6 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
     // Log the update data for debugging
     log.Printf("Update data: %+v", updateData)
 
-
     // Update user in repository
     updateUser, err := h.repository.UpdateUser(context, uint(userId), updateData)
     if err != nil {
@@ -145,9 +162,10 @@ func (h *UserHandler) UpdateUser(ctx *fiber.Ctx) error {
     return h.response(ctx, fiber.StatusOK, "Profile updated successfully", updateUser)
 }
 
-func NewUserHandler(router fiber.Router, repository models.UserRepository) {
+func NewUserHandler(router fiber.Router, repository models.UserRepository, authRepository models.AuthRepository) {
 	handler := &UserHandler{
-		repository: repository,
+		repository:     repository,
+		authRepository: authRepository,
 	}
 
 	router.Put("/update_profile", handler.UpdateUser)
