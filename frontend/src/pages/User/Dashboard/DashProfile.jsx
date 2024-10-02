@@ -1,9 +1,9 @@
 import React from 'react'
-import Sidebar from './Partials/Sidebar'
-import DashboardContent from './Partials/DashboardContent'
-import TopBar from './Partials/TopBar'
+import Sidebar from './Partials/Sidebar.jsx';
+import TopBar from './Partials/TopBar.jsx';
+import Profile from './Partials/Profile.jsx';
 
-export default function Dashboard() {
+export default function DashProfile() {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -15,8 +15,8 @@ export default function Dashboard() {
         {/* TopBar */}
         <TopBar />
 
-        {/* Dashboard Content */}
-        <DashboardContent />
+        {/* Profile Content */}
+        <Profile/>
       </div>
     </div>
   )

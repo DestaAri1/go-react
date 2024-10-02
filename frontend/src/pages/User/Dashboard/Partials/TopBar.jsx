@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import useDropdown from '../../../../hooks/useDropDown.js';
 import useAuth from '../../../../hooks/useAuth.js';
 import DropdownUser from '../../../../layouts/partials/DropdownUser.jsx';
+import LoadingSpinner from '../../../../components/LoadingSpinner.js';
 
 export default function TopBar() {
   const { isDropdownOpen, toggleDropdown, closeDropdown } = useDropdown();
@@ -54,7 +55,7 @@ export default function TopBar() {
           )}
         </div>
       ) : (
-        <div>Loading user data...</div>
+        <LoadingSpinner/>
       )}
     </div>
   );

@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '../components/LoadingSpinner.js';
 import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
 import DropdownUser from './partials/DropdownUser.jsx';
+import LinkNavbar from '../components/LinkNavbar.jsx';
 
 export default function Navbar({ title = "Concert Tickets" }) {
   const { token, user, setUser } = useAuth();
@@ -43,10 +43,10 @@ export default function Navbar({ title = "Concert Tickets" }) {
       <div className="container flex justify-between items-center">
         <div className="text-white text-2xl font-bold w-[15%]">{title}</div>
         <ul className="flex space-x-6 w-[70%] justify-center">
-          <li><Link to="/" className="text-white hover:text-indigo-500">Home</Link></li>
-          <li><Link to="/concerts" className="text-white hover:text-indigo-500">Concerts</Link></li>
-          <li><Link to="/about" className="text-white hover:text-indigo-500">About</Link></li>
-          <li><Link to="/contact" className="text-white hover:text-indigo-500">Contact</Link></li>
+          <li><LinkNavbar url={'/'} name={'Home'}/></li>
+          <li><LinkNavbar url={'/concerts'} name={'Concerts'}/></li>
+          <li><LinkNavbar url={'/about'} name={'About'}/></li>
+          <li><LinkNavbar url={'/contact'} name={'Contact'}/></li>
         </ul>
         <div className='w-[15%] flex justify-end'>
           {isLoading ? (
@@ -70,7 +70,7 @@ export default function Navbar({ title = "Concert Tickets" }) {
               )}
             </div>
           ) : (
-            <Link to="/login" className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">Sign In</Link>
+            <LinkNavbar url={'/login'} name={'Sign In'} style={'px-4 py-2 rounded-lg'}/>
           )}
         </div>
       </div>

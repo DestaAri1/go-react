@@ -10,6 +10,7 @@ import Tickets from "./pages/User/Tickets/Tickets.tsx";
 import TicketsDetail from "./pages/User/Tickets/TicketsDetail.jsx";
 import Profile from "./pages/User/Profile/Profile.jsx";
 import Dashboard from "./pages/User/Dashboard/Dashboard.jsx";
+import DashProfile from "./pages/User/Dashboard/DashProfile.jsx";
 
 function App() {
   return (
@@ -27,7 +28,8 @@ function App() {
         <Route path="/tickets/:id" element={<ProtectedRoute><TicketsDetail/></ProtectedRoute>}/>
 
         {/* halaman untuk admin */}
-        <Route path="dashboard" element={<AdminRoute><Dashboard/></AdminRoute>}/>
+        <Route path="/dashboard" element={<AdminRoute><Dashboard/></AdminRoute>}/>
+        <Route path="/dashboard/profile" element={<AdminRoute><DashProfile/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

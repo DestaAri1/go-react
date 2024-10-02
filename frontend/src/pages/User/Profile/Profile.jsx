@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useAuth from '../../../hooks/useAuth';
 import Navbar from '../../../layouts/Navbar';
 import TextView from '../../../components/Text.jsx';
 import Input from '../../../components/Input.js';
-import { updateUser } from '../../../services/authService.js';
-import { showSuccessToast } from '../../../utils/Toast.js';
 import { ToastContainer } from 'react-toastify';
-import LoadingSpinner from '../../../components/LoadingSpinner.js';
+import { useProfile } from '../../../hooks/useProfile.js';
 
 export default function Profile() {
     const { user, setUser } = useAuth();
-    const [formData, setFormData] = useState({ username: '', password: '' });
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
-    const [previewImage, setPreviewImage] = useState(null);
+    const {
+        isLoading,
+        formData,
+        previewImage,
+        handleChange,
+        handleFileChange,
+        handleSubmit
+    } = useProfile(user, setUser);
 
     useEffect(() => {
         return () => {
@@ -23,48 +24,6 @@ export default function Profile() {
             }
         };
     }, [previewImage]);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData({ ...formData, image: file });
-            setPreviewImage(URL.createObjectURL(file));
-        }
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError(null);
-        setSuccess(null);
-
-        try {
-            const response = await updateUser(formData.username, formData.password, formData.image);
-            
-            // Update the user data after success
-            setUser((prevUser) => ({
-                ...prevUser,
-                name: formData.username || prevUser.name,
-                image: previewImage || prevUser.image, // Use the preview image URL
-            }));
-
-            showSuccessToast(response.message);
-
-            setFormData({ username: '', password: '', image: null });
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000); // Wait for 2 seconds before refreshing
-        } catch (err) {
-            setError(err.message || "Error updating profile");
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-gray-900 text-white flex flex-col">
@@ -100,6 +59,7 @@ export default function Profile() {
                                             label_color="text-gray-400"
                                             type="text"
                                             name="username"
+                                            tampilan='user'
                                             value={formData.username}
                                             onChange={handleChange}
                                         />
@@ -124,13 +84,10 @@ export default function Profile() {
                                             className="w-full px-4 py-2 rounded bg-gray-700 text-white border border-gray-600"
                                         />
                                     </div>
-                                    {loading && <LoadingSpinner/>}
-                                    {error && <p className="text-center text-red-500">{error}</p>}
-                                    {success && <p className="text-center text-green-500">{success}</p>}
                                     <button
                                         type="submit"
                                         className="w-full bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600"
-                                        disabled={loading}
+                                        disabled={isLoading}
                                     >
                                         Update Profile
                                     </button>
