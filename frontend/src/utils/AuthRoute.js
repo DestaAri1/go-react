@@ -26,6 +26,10 @@ export const ProtectedRoute = ({children}) =>  {
 export const AdminRoute = ({children}) => {
   const {user} = useAuth()
 
+  if (!getToken()) {
+    return <Navigate to="/login" />;
+  }
+
   // Periksa apakah user sudah ada dan apakah role-nya adalah admin (role 0)
   if (user && user.role !== 0) {
     return <Navigate to="/" />; // Redirect jika bukan admin
