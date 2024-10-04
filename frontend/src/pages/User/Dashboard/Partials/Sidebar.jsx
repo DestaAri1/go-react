@@ -1,9 +1,9 @@
 import React from 'react';
-import { FaTachometerAlt, FaUsers, FaCog, FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
+import { FaTachometerAlt, FaCog, FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import { MdEvent } from "react-icons/md";
 import LinkSidebar from '../../../../components/LinkSidebar';
 
-export default function Sidebar({ isExpanded, toggleSidebar }) {
+export default function Sidebar({ isExpanded, toggleSidebar, title }) {
   return (
     <div
       className={`fixed h-screen bg-gray-900 text-white shadow-lg transition-all duration-300 ${
@@ -25,7 +25,7 @@ export default function Sidebar({ isExpanded, toggleSidebar }) {
         className={`p-4 transition-all duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0 translate-x-[-100%]'} 
         ${isExpanded ? 'block' : 'hidden'}`}
       >
-        <h2 className="text-2xl font-bold text-center">Dashboard</h2>
+        <h2 className="text-2xl font-bold text-center">{title}</h2>
         <hr className="border-gray-700 mt-4" />
       </div>
 

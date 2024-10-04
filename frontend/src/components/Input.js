@@ -1,6 +1,8 @@
 import React from 'react';
 
-export default function Input({ label, label_color = "text-gray-700", type, name, value, onChange, tampilan = 'user', placeholder }) {
+export default function Input({ label, label_color = "text-gray-700", 
+                                type, name, value, onChange, tampilan = 'user', 
+                                placeholder, required = false }) {
   
   const getStyle = () => {
     switch (tampilan) {
@@ -25,6 +27,7 @@ export default function Input({ label, label_color = "text-gray-700", type, name
         onChange={onChange}
         className={`${getStyle()}`}
         placeholder={placeholder}
+        required={required}
       />
     </div>
   );

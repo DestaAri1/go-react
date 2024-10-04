@@ -29,7 +29,7 @@ export default function DropdownUser({ user }) {
   return (
     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
       {/* Jika saat ini berada di Dashboard, tampilkan link Home, jika tidak tampilkan link Dashboard */}
-      {nowLocation === '/dashboard' || nowLocation === '/dashboard/profile' ? (
+      {nowLocation === '/dashboard' || nowLocation === '/dashboard/profile' || nowLocation === '/dashboard/event' ? (
         <div>
           <LinkDropDown url={"/"} name={'Home'}/>
           <LinkDropDown url={"/dashboard/profile"} name={'Profile'}/>

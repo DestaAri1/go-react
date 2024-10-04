@@ -11,6 +11,7 @@ import TicketsDetail from "./pages/User/Tickets/TicketsDetail.jsx";
 import Profile from "./pages/User/Profile/Profile.jsx";
 import Dashboard from "./pages/User/Dashboard/Dashboard.jsx";
 import DashProfile from "./pages/User/Dashboard/DashProfile.jsx";
+import DashConcerts from "./pages/User/Dashboard/DashConcerts.jsx";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         {/* halaman untuk admin */}
         <Route path="/dashboard" element={<AdminRoute><Dashboard/></AdminRoute>}/>
         <Route path="/dashboard/profile" element={<AdminRoute><DashProfile/></AdminRoute>}/>
+        <Route path="/dashboard/event" element={<AdminRoute><DashConcerts/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

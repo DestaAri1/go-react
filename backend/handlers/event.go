@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -101,11 +102,13 @@ func (h *EventHandler) CreateOne(ctx *fiber.Ctx) error {
 	defer cancel()
 
 	if err := ctx.BodyParser(event); err != nil {
+		log.Println("humu")
 		return h.handleError(ctx, fiber.StatusUnprocessableEntity, err.Error())
 	}
 
 	formData := &models.FormEventInput{} // Asumsikan kamu punya struct untuk form input
 	if err := ctx.BodyParser(formData); err != nil {
+		log.Println("hehee")
 		return h.handleSuccess(ctx, fiber.StatusUnprocessableEntity, err.Error(), nil)
 	}
 
