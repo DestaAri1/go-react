@@ -12,6 +12,7 @@ import Profile from "./pages/User/Profile/Profile.jsx";
 import Dashboard from "./pages/User/Dashboard/Dashboard.jsx";
 import DashProfile from "./pages/User/Dashboard/DashProfile.jsx";
 import DashConcerts from "./pages/User/Dashboard/DashConcerts.jsx";
+import UpdateConcerts from "./pages/User/Dashboard/UpdateConcerts.jsx";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/dashboard" element={<AdminRoute><Dashboard/></AdminRoute>}/>
         <Route path="/dashboard/profile" element={<AdminRoute><DashProfile/></AdminRoute>}/>
         <Route path="/dashboard/event" element={<AdminRoute><DashConcerts/></AdminRoute>}/>
+        <Route path="/dashboard/event/:id" element={<AdminRoute><UpdateConcerts/></AdminRoute>}/>
       </Routes>
     </BrowserRouter>
   );

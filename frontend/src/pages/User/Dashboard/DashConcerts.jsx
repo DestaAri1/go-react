@@ -2,7 +2,7 @@ import React from 'react';
 import Sidebar from './Partials/Sidebar';
 import useSidenav from '../../../hooks/useSidenav.js';
 import TopBar from './Partials/TopBar.jsx';
-import ConcertList from './Partials/ConcertList.jsx';
+import ConcertList from './Partials/ConcertList.tsx';
 import AddConcertModal from './Partials/AddConcertModal.jsx';
 import useModal from '../../../hooks/useModal.js';
 import { ToastContainer } from 'react-toastify';

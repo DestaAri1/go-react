@@ -1,8 +1,8 @@
 import React from 'react';
 
-export default function Pagination({ currentPage, totalPages, onPageChange }) {
+export default function Pagination({ currentPage, totalPages, onPageChange, text_color = 'text-white' }) {
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex items-center justify-center mt-4">
       <button 
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
         disabled={currentPage === 1}
@@ -10,7 +10,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       >
         Previous
       </button>
-      <span className="mx-4 text-white">Page {currentPage} of {totalPages}</span>
+      <span className={`mx-4 ${text_color}`}>Page {currentPage} of {totalPages}</span>
       <button 
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
         disabled={currentPage === totalPages}
