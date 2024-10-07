@@ -3,23 +3,30 @@ import Navbar from '../../layouts/Navbar.jsx';
 import Footer from '../../layouts/Footer.jsx';
 import ConcertList from '../../components/ConcertList.jsx';
 import useConcert from '../../hooks/useConcert.js';
-import { typeConcert } from '../../types/typeConcert.js';
 import useLoading from '../../hooks/useLoading.js';
 import LoadingSpinner from '../../components/LoadingSpinner.js';
 import { Link, useLocation } from 'react-router-dom';
 import { showSuccessToast } from '../../utils/Toast.js';
+import { getToken } from '../../services/authService.js';
 
 export default function Home() {
   const { isLoading, setLoading } = useLoading(true);
   const location = useLocation();
   const message = location.state?.message;
-  const dataConcert: typeConcert[] = useConcert() || [];
+  const { dataConcert, refreshConcerts } = useConcert();
 
   useEffect(() => {
-    if (dataConcert.length >= 0) {
+    if (dataConcert !== null) {
       setLoading(false);
     }
   }, [dataConcert, setLoading]);
+
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      refreshConcerts();
+    }
+  }, []);
   
   useEffect(() => {
     // Menangani notifikasi

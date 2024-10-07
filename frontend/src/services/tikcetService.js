@@ -26,7 +26,7 @@ export const getOneTicket = async(id) => {
   try {
     const response = await axios.get(`${API_URL}/ticket/${id}`, {
       headers:header})
-      return response
+      return response.data.data
   } catch (error) {
     if (error.response) {
       throw error.response.data.message;

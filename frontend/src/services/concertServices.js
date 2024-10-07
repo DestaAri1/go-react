@@ -2,17 +2,32 @@ import { getToken } from '../utils/AuthRoute';
 import axios from 'axios';
 
 const API_URL = "http://localhost:3000/api";
-const token = getToken();
+// Buat instance axios terpisah untuk concert service
+const concertAxios = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  }
+});
+
+// Tambahkan interceptor untuk menambahkan token pada setiap request
+concertAxios.interceptors.request.use(
+  (config) => {
+    const token = getToken(); // Mengambil token terbaru setiap request
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export const getAllConcert = async () => {
   try {
-    const response = await axios.get(`${API_URL}/event`, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      }
-    });
+    const response = await concertAxios.get('/event');
     return response;
   } catch (error) {
     if (error.response) {
@@ -24,13 +39,7 @@ export const getAllConcert = async () => {
 
 export const getOneConcert = async(id) => {
   try {
-    const response = await axios.get(`${API_URL}/event/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      }
-    });
+    const response = await concertAxios.get(`/event/${id}`)
     return response;
   } catch (error) {
     if (error.response) {
@@ -42,16 +51,9 @@ export const getOneConcert = async(id) => {
 
 export const postConcert = async (name, location, date) => {
   try {
-    const response = await axios.post(`${API_URL}/event`,
-      { name, location, date },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        }
-      }
-    );
+    const response = await concertAxios.post('/event', {
+      name, location, date
+    })
     return response;
   } catch (error) {
     if (error.response) {
@@ -63,16 +65,9 @@ export const postConcert = async (name, location, date) => {
 
 export const updateConcert = async(id, name, location, date) => {
   try {
-    const response = await axios.put(`${API_URL}/event/${id}`,
-      { name, location, date },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${token}`,
-        }
-      }
-    );
+    const response = await concertAxios.put(`/event/${id}`, {
+      name, location, date
+    })
     return response;
   } catch (error) {
     if (error.response) {

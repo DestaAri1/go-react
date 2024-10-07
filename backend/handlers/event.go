@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -101,27 +100,21 @@ func (h *EventHandler) CreateOne(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
 
-	if err := ctx.BodyParser(event); err != nil {
-		log.Println("humu")
+	formData := &models.FormEventInput{}
+	if err := ctx.BodyParser(formData); err != nil {
 		return h.handleError(ctx, fiber.StatusUnprocessableEntity, err.Error())
 	}
 
-	formData := &models.FormEventInput{} // Asumsikan kamu punya struct untuk form input
-	if err := ctx.BodyParser(formData); err != nil {
-		log.Println("hehee")
-		return h.handleSuccess(ctx, fiber.StatusUnprocessableEntity, err.Error(), nil)
+	// Validasi format tanggal
+	if _, err := time.Parse("2006-01-02", formData.Date); err != nil {
+		return h.handleError(ctx, fiber.StatusBadRequest, "Invalid date format. Use YYYY-MM-DD")
 	}
 
 	if err := validator.New().Struct(formData); err != nil {
 		return h.handleValidationError(ctx, err)
 	}
 
-	event.Name = formData.Name
-	event.Location = formData.Location
-	event.Date = formData.Date
-
 	event, err := h.repository.CreateOne(context, event, formData)
-
 	if err != nil {
 		return h.handleError(ctx, fiber.StatusBadRequest, err.Error())
 	}

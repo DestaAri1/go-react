@@ -49,7 +49,7 @@ export default function AddConcertModal({ closeModal }) {
           <div className="mb-4">
             <Input
               label={'Date'}
-              type={'datetime-local'}
+              type={'date'}
               value={concertData.date}
               name={'date'}
               tampilan={'admin'}

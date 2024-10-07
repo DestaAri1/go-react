@@ -1,21 +1,34 @@
-import React from 'react'
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import useAuth from '../hooks/useAuth';
+import LoadingSpinner from '../components/LoadingSpinner'; // Sesuaikan dengan path yang benar
 
-export const getToken = function () {
-  return Cookies.get('token')
+export const getToken = () => {
+  return Cookies.get('token');
 }
 
 export const AuthRoute = ({children}) => {
-    if (getToken()) {
-      return <Navigate to="/" />; // Redirect ke halaman utama jika token ditemukan
-    }
-    
-    return <>{children}</>;
+  const { isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  
+  if (getToken()) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
 }
 
-export const ProtectedRoute = ({children}) =>  {
+export const ProtectedRoute = ({children}) => {
+  const { isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  
   if (!getToken()) {
     return <Navigate to="/login" />;
   }
@@ -24,20 +37,23 @@ export const ProtectedRoute = ({children}) =>  {
 }
 
 export const AdminRoute = ({children}) => {
-  const {user} = useAuth()
-
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+  
   if (!getToken()) {
     return <Navigate to="/login" />;
   }
-
-  // Periksa apakah user sudah ada dan apakah role-nya adalah admin (role 0)
+  
   if (user && user.role !== 0) {
-    return <Navigate to="/" />; // Redirect jika bukan admin
+    return <Navigate to="/" />;
   }
-
+  
   return <>{children}</>;
 }
 
-export const DeleteToken = function () {
-  Cookies.remove("token", {path : '/'})
+export const DeleteToken = () => {
+  Cookies.remove("token", { path: '/' });
 }

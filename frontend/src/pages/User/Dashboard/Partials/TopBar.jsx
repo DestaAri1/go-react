@@ -4,6 +4,8 @@ import useAuth from '../../../../hooks/useAuth.js';
 import DropdownUser from '../../../../layouts/partials/DropdownUser.jsx';
 import LoadingSpinner from '../../../../components/LoadingSpinner.js';
 import { FaSearch } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function TopBar() {
   const { isDropdownOpen, toggleDropdown, closeDropdown } = useDropdown();
@@ -47,12 +49,18 @@ export default function TopBar() {
             onClick={toggleDropdown}
             className="flex items-center space-x-2 p-2 rounded-md transition duration-200"
           >
-            <img
+          {user.image !== '' ? (
+              <img
               src={`http://127.0.0.1:3000/uploads/${user.image}`} // Pastikan URL gambar benar
               alt="User"
               className="w-10 h-10 rounded-full object-cover"
               onError={(e) => { e.target.onerror = null; e.target.src = '/default-avatar.png'; }} // Fallback jika gambar tidak ada
             />
+          ) : (
+            <div className='flex items-center w-10 h-10 rounded-full cursor-pointer'>
+              <FontAwesomeIcon icon={faUser}/>
+            </div>
+          )}
             <span className="font-medium text-gray-700">{user.name}</span>
           </button>
 
