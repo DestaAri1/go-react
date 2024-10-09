@@ -1,11 +1,13 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import LoadingSpinner from '../components/LoadingSpinner.js';
 import useAuth from '../hooks/useAuth.js';
 import useDropdown from '../hooks/useDropDown.js';
-import DropdownUser from './partials/DropdownUser.jsx';
-import LinkNavbar from '../components/LinkNavbar.jsx';
+
+// Lazy loading components
+const LoadingSpinner = lazy(() => import('../components/LoadingSpinner.js'));
+const DropdownUser = lazy(() => import('./partials/DropdownUser.jsx'));
+const LinkNavbar = lazy(() => import('../components/LinkNavbar.jsx'));
 
 export default function Navbar({ title = "Concert Tickets" }) {
   const { token, user, setUser } = useAuth();
@@ -42,15 +44,19 @@ export default function Navbar({ title = "Concert Tickets" }) {
     <nav className="bg-gray-900 p-4 sticky top-0 z-10">
       <div className="container flex justify-between items-center">
         <div className="text-white text-2xl font-bold w-[15%]">{title}</div>
-        <ul className="flex space-x-6 w-[70%] justify-center">
-          <li><LinkNavbar url={'/'} name={'Home'}/></li>
-          <li><LinkNavbar url={'/concerts'} name={'Concerts'}/></li>
-          <li><LinkNavbar url={'/about'} name={'About'}/></li>
-          <li><LinkNavbar url={'/contact'} name={'Contact'}/></li>
-        </ul>
+        <Suspense fallback={<LoadingSpinner/>}>
+          <ul className="flex space-x-6 w-[70%] justify-center">
+            <li><LinkNavbar url={'/'} name={'Home'} /></li>
+            <li><LinkNavbar url={'/concerts'} name={'Concerts'} /></li>
+            <li><LinkNavbar url={'/about'} name={'About'} /></li>
+            <li><LinkNavbar url={'/contact'} name={'Contact'} /></li>
+          </ul>
+        </Suspense>
         <div className='w-[15%] flex justify-end'>
           {isLoading ? (
-            <LoadingSpinner />
+            <Suspense fallback={<LoadingSpinner/>}>
+              <LoadingSpinner />
+            </Suspense>
           ) : token && user ? (
             <div className="relative">
               {user.image ? (
@@ -66,11 +72,15 @@ export default function Navbar({ title = "Concert Tickets" }) {
                 </div>
               )}
               {isDropdownOpen && (
-                <DropdownUser user={user} updateUserData={updateUserData} />
+                <Suspense fallback={<LoadingSpinner/>}>
+                  <DropdownUser user={user} updateUserData={updateUserData} />
+                </Suspense>
               )}
             </div>
           ) : (
-            <LinkNavbar url={'/login'} name={'Sign In'} style={'px-4 py-2 rounded-lg'}/>
+            <Suspense fallback={<LoadingSpinner/>}>
+              <LinkNavbar url={'/login'} name={'Sign In'} style={'px-4 py-2 rounded-lg'} />
+            </Suspense>
           )}
         </div>
       </div>

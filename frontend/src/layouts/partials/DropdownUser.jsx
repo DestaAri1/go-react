@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner.js';
 import useLoading from '../../hooks/useLoading.js';
 import useAuth from '../../hooks/useAuth.js';
@@ -10,6 +10,7 @@ export default function DropdownUser({ user }) {
   const navigate = useNavigate();
   const { isLoading, setLoading } = useLoading(false);
   const { logout } = useAuth();
+  const {id} = useParams()
   const location = useLocation();
   const nowLocation = location.pathname
 
@@ -29,7 +30,8 @@ export default function DropdownUser({ user }) {
   return (
     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2">
       {/* Jika saat ini berada di Dashboard, tampilkan link Home, jika tidak tampilkan link Dashboard */}
-      {nowLocation === '/dashboard' || nowLocation === '/dashboard/profile' || nowLocation === '/dashboard/event' ? (
+      {user.role === 0 && (nowLocation === '/dashboard' || nowLocation === '/dashboard/profile' || nowLocation === '/dashboard/event'
+      || nowLocation === `/dashboard/event/${id}`) ? (
         <div>
           <LinkDropDown url={"/"} name={'Home'}/>
           <LinkDropDown url={"/dashboard/profile"} name={'Profile'}/>
