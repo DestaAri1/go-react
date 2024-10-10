@@ -30,12 +30,12 @@ export default function Home() {
   }, [dataConcert, setLoading]);
 
   // Effect untuk refresh concerts
-  useEffect(() => {
-    const token = getToken();
-    if (token) {
-      refreshConcerts();
-    }
-  }, [refreshConcerts]);
+  // useEffect(() => {
+  //   const token = getToken();
+  //   if (token) {
+  //     refreshConcerts();
+  //   }
+  // }, []);
 
   // Effect untuk handling toast message
   useEffect(() => {

@@ -76,3 +76,15 @@ export const updateConcert = async(id, name, location, date) => {
     throw new Error("Network error");
   }
 }
+
+export const deleteContent = async(id) => {
+  try {
+    const response = await concertAxios.delete(`event/${id}`)
+    return response
+  } catch (error) {
+    if (error.response) {
+      throw error.response.data.message;
+    }
+    throw new Error("Network error");
+  }
+}

@@ -5,12 +5,16 @@ import TopBar from './Partials/TopBar.jsx';
 import ConcertList from './Partials/ConcertList.jsx';
 import AddConcertModal from './Partials/AddConcertModal.jsx';
 import useModal from '../../../hooks/useModal.js';
+import useConcert from '../../../hooks/useConcert.js';
+import useLoading from '../../../hooks/useLoading.js';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function DashConcerts() {
   const { isSidebarExpanded, handleToggleSidebar } = useSidenav();
   const { isModalOpen, handleOpenModal, handleCloseModal } = useModal();
+  const { dataConcert, refreshConcerts } = useConcert();
+  const { isLoading, setLoading } = useLoading();
 
   return (
     <>
@@ -18,10 +22,10 @@ export default function DashConcerts() {
       <div className="flex h-screen">
         {/* Sidebar */}
         <div className={`${isSidebarExpanded ? 'w-64' : 'w-20'} transition-all duration-300`}>
-          <Sidebar 
-            isExpanded={isSidebarExpanded} 
-            toggleSidebar={handleToggleSidebar} 
-            title={'Events'} 
+          <Sidebar
+            isExpanded={isSidebarExpanded}
+            toggleSidebar={handleToggleSidebar}
+            title={'Events'}
           />
         </div>
 
@@ -42,7 +46,12 @@ export default function DashConcerts() {
               </button>
             </div>
             
-            <ConcertList />
+            <ConcertList 
+              dataConcert={dataConcert}
+              refreshConcerts={refreshConcerts}
+              isLoading={isLoading}
+              setLoading={setLoading}
+            />
           </div>
         </div>
 

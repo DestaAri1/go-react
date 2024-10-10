@@ -1,4 +1,3 @@
-// pages/Concert.jsx
 import React, { useEffect, useState } from 'react';
 import Navbar from '../../layouts/Navbar.jsx';
 import useLoading from '../../hooks/useLoading.js';
@@ -11,45 +10,50 @@ import useConcert from '../../hooks/useConcert.js';
 import { useScrollPosition } from '../../hooks/useScrollPositon.js';
 
 export default function Concert() {
-  const { isLoading, setLoading } = useLoading(true);
-  const { dataConcert, refreshConcerts } = useConcert();
-  
-  // Implementasi scroll position
+  // Hapus useLoading karena kita akan menggunakan loading state dari useConcert
+  const { dataConcert } = useConcert();
   const { isReady } = useScrollPosition('home-page');
-
-  // Paksa dataConcert menjadi array, meskipun datanya tidak sesuai
-  const dataConcertReal = Array.isArray(dataConcert) ? dataConcert : [];
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    if (dataConcert === null || dataConcert.length === 0) {
-      // Panggil refreshConcerts hanya jika dataConcert kosong atau null
-      refreshConcerts();
-    }
-    setLoading(false);
-  }, [dataConcert, setLoading, refreshConcerts]);
-    
-  const totalPages = getTotalPages(dataConcertReal, itemsPerPage);
-  const paginatedConcerts = paginate(dataConcertReal, currentPage, itemsPerPage);
+  // Tambahkan state untuk track apakah data sedang loading
+  const {isLoading, setLoading} = useLoading(true);
 
-  // Komponen loading fallback
-  const LazyLoadFallback = () => (
+  // Effect untuk mengatur loading state berdasarkan ketersediaan data
+  useEffect(() => {
+    if (dataConcert !== null) {
+      setLoading(false);
+    }
+  }, [dataConcert]);
+
+  const concertData = React.useMemo(() => {
+    const dataConcertReal = Array.isArray(dataConcert) ? dataConcert : [];
+    const totalPages = getTotalPages(dataConcertReal, itemsPerPage);
+    const paginatedConcerts = paginate(dataConcertReal, currentPage, itemsPerPage);
+
+    return {
+      dataConcertReal,
+      totalPages,
+      paginatedConcerts
+    };
+  }, [dataConcert, currentPage, itemsPerPage]);
+
+  const LazyLoadFallback = React.memo(() => (
     <div className="flex justify-center items-center min-h-[200px]">
       <LoadingSpinner color="text-gray-500" />
     </div>
-  );
+  ));
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-gray-900 text-white flex flex-col justify-between"
       style={{ opacity: isReady ? 1 : 0, transition: 'opacity 0.3s ease-in' }}
     >
       <Navbar />
-      <div 
+      <div
         className="flex-grow mt-2 container mx-auto px-4"
-        style={{ minHeight: '500px' }} // Tambahkan minimum height
+        style={{ minHeight: '500px' }}
       >
         <h2 className="text-4xl font-semibold text-center mb-8">Concert List</h2>
         
@@ -57,12 +61,12 @@ export default function Concert() {
           <LoadingSpinner color="text-gray-500" />
         ) : (
           <>
-            {Array.isArray(dataConcert) && dataConcert.length > 0 ? (
+            {concertData.dataConcertReal.length > 0 ? (
               <>
-                <ConcertList concerts={paginatedConcerts} />
+                <ConcertList concerts={concertData.paginatedConcerts} />
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={totalPages}
+                  totalPages={concertData.totalPages}
                   onPageChange={setCurrentPage}
                 />
               </>

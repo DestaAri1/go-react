@@ -2,36 +2,75 @@ import { useEffect, useState } from "react"
 import { getAllConcert, getOneConcert, postConcert, updateConcert } from "../services/concertServices"
 import useLoading from "./useLoading";
 import { showErrorToast, showSuccessToast } from "../utils/Toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getToken } from "../services/authService";
 
+// Debounce utility function to delay function execution
+const debounce = (func, delay) => {
+  let timeoutId;
+  return (...args) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, delay);
+  };
+};
+
 export default function useConcert() {
+  const location = useLocation();
+  const nowLocation = location.pathname
   const [dataConcert, setConcert] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const { setLoading } = useLoading(false); // Set initial loading to false
+
+  const nowLoc = (path) => {
+    switch (path) {
+      case '/dashboard/event':
+        return 0;
+      default:
+        return 1000;
+    }
+  };
 
   const fetchConcerts = async () => {
+    const token = getToken();
+    if (!token) {
+      console.error("Token is missing, cannot fetch concerts");
+      return;
+    }
+
     try {
+      setLoading(true);
       const response = await getAllConcert();
       setConcert(response.data.data);
     } catch (error) {
       console.error("Failed to fetch concert data:", error);
+      // Set empty array instead of null on error
+      setConcert([]);
+    } finally {
+      setLoading(false);
     }
   };
+
+  const fetchConcertsDebounced = debounce(fetchConcerts, nowLoc(nowLocation));
 
   useEffect(() => {
-    const token = getToken();
-    if (token && !isInitialized) {
+    if (!isInitialized) {
       setIsInitialized(true);
-      fetchConcerts();
+      fetchConcertsDebounced();
     }
-  }, [isInitialized]);
+  }, [isInitialized, fetchConcertsDebounced]);
 
-  // Menambahkan method untuk memperbarui data
   const refreshConcerts = () => {
-    fetchConcerts();
+    fetchConcertsDebounced();
   };
 
-  return { dataConcert, refreshConcerts };
+  return { 
+    dataConcert,
+    refreshConcerts
+  };
 }
 
 export const useConcertForm = (initialData, closeModal) => {
@@ -145,3 +184,7 @@ export const useConcertUpdateForm = (initialData) => {
     isLoading,
   };
 };
+
+export const deleteConcert = (initialData, closeModal) => {
+  
+}
